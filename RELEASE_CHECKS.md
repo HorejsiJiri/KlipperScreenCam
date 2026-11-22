@@ -1,4 +1,4 @@
-# Release checks — 0.3.0 (test candidate)
+# Release checks — 0.3.0
 
 Date: 2026-11-22. First public release baseline, with a default local limit of 15 FPS.
 
@@ -14,8 +14,10 @@ Date: 2026-11-22. First public release baseline, with a default local limit of 1
   streams without Content-Length and an independent second client.
 - The Linux GitHub Actions workflow additionally runs native systemd validation.
 
-These are local results for the final source package. Earlier baseline Actions runs
-passed, but this package has not yet been uploaded or checked in GitHub Actions.
+The application sources were published in commit c73b19fa2e090f68ef9c027bedb451dc766c597c.
+[GitHub Actions passed](https://github.com/HorejsiJiri/KlipperScreenCam/actions/runs/45071373818),
+including native Linux/systemd validation. All 78 committed files matched the source package.
+The release documentation wording is finalized separately; current checks remain visible in Actions.
 
 ## Target deployment
 

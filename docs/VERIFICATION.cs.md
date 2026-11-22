@@ -1,4 +1,4 @@
-# Stav ověření — 0.3.0 (testovací sestavení)
+# Stav ověření — 0.3.0
 
 Datum: 2026-11-22. Výsledky cílového nasazení jsou oddělené od místních testů.
 

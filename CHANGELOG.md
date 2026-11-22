@@ -6,7 +6,7 @@ Future releases get their own dated entry; published release entries are retaine
 
 ## 0.3.0 — 2026-11-22 
 
-First public release baseline. The revised menu awaits target-device validation.
+First public release baseline. See RELEASE_CHECKS.md for validation scope.
 
 ### Features
 

@@ -6,7 +6,7 @@ Keep printer controls on one HDMI screen and a selected camera on the other.
 [Český návod](README.cs.md) · [Second HDMI display and touch setup](docs/SECOND_DISPLAY.cs.md) ·
 [Deployment](docs/DEPLOY.cs.md) · [Translations](docs/TRANSLATIONS.cs.md)
 
-**Version 0.3.0 — test candidate.** New live FPS controls await target validation.
+**Version 0.3.0.**
 The preceding 0.2.3 version was tested as follows: Video, touch controls and automatic startup were confirmed on a
 Raspberry Pi 5, Debian 13 (Trixie), X11 and two 1024 × 600 touch displays. Actual
 stream shutdown was verified, and the user confirmed smooth video with the default

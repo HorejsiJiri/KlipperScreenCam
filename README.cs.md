@@ -4,7 +4,7 @@ Samostatný dotykový kamerový displej pro tiskárny s Klipperem a Moonrakerem.
 Na jednom monitoru zůstává KlipperScreen, na druhém běží KlipperScreenCam.
 Přehrává existující HTTP MJPEG streamy; nemění nastavení kamer ani výběr ve webovém Mainsailu.
 
-**Verze 0.3.0 — k otestování.** Nové přepínání FPS ještě nebylo ověřeno na RPi.
+**Verze 0.3.0.**
 Předchozí samostatnou verzi 0.2.3 uživatel nasadil a potvrdil funkční obraz, ovládání
 a automatický start na RPi5 / Debianu 13 / X11 / dvou HDMI displejích 1024 × 600.
 Výchozí limit je 15 FPS; uživatel potvrdil plynulý obraz. Nové překlady ještě potřebují kontrolu rodilými mluvčími.
@@ -197,4 +197,4 @@ vloží mezi tlačítka ve vzestupném pořadí bez duplicit. První řádek má
 číselná tlačítka mají stejnou šířku a Neomezeně vyplní zbytek druhého řádku.
 Pořadí menu: kamery, červené vypnutí/zapnutí obrazu s ikonou, nadpis Limity snímků,
 naměřené FPS a tlačítka limitů.
-Testovací nasazení: [TEST_0.3.0.cs.md](docs/TEST_0.3.0.cs.md).
+Postup nasazení a ověření: [TEST_0.3.0.cs.md](docs/TEST_0.3.0.cs.md).
