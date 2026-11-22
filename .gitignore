@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+*.log
+*.bak*
+local.conf
+work/
+node_modules/
+package-lock.json
