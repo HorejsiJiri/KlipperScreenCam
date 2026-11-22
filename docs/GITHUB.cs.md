@@ -21,7 +21,7 @@ Po kontrole souborů můžeš připravit první commit:
 
 ```bash
 git add .
-git commit -m "Release KlipperScreenCam 0.2.0"
+git commit -m "Release KlipperScreenCam 0.3.0"
 ```
 
 Na GitHubu založ prázdný repozitář KlipperScreenCam. V následujícím příkladu nahraď
@@ -35,3 +35,13 @@ git push -u origin main
 Pokud origin už existuje, nejdříve ověř jeho URL pomocí `git remote -v`; nevytvářej druhý
 origin a neměň jej naslepo. GitHub Actions pak spustí kontroly. Jejich výsledek zkontroluj
 před označením releasu a přiložením archivů. V této přípravě žádný push ani publikace neproběhly.
+
+## První veřejný balíček a changelog
+
+Aktuální baseline je 0.3.0. CHANGELOG.md slučuje přípravné iterace do jednoho
+přehledu prvního vydání. Pro další zveřejněné změny přidej novou sekci s verzí
+a datem; již publikované záznamy zachovej. Zdrojové soubory nyní nahraď běžným
+commitem v existujícím repozitáři, bez přepisování historie a bez smazání .git.
+Nezakládej duplicitní repozitář. Nahraj i .github, .gitignore a .gitattributes.
+Po nahrání ověř Actions; teprve pak vytvoř tag v0.3.0 a Release s aktuálními archivy
+a SHA256SUMS. Toto lokální balení samo GitHub nemění.

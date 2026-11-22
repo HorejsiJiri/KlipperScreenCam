@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install only our service. Never edit KlipperScreen/Crowsnest/Moonraker."""
+"""Install our service and register it in the Moonraker service allowlist."""
 import argparse
 import os
 from pathlib import Path
@@ -63,6 +63,31 @@ def managed_unit():
         raise RuntimeError(f"Existing unit is not managed by this installer: {UNIT}")
 
 
+def register_moonraker_service(data_dir):
+    """Append only our service, preserving bytes and a first-change backup."""
+    path = Path(data_dir) / "moonraker.asvc"
+    if not path.parent.is_dir():
+        raise ValueError(f"Moonraker data directory does not exist: {path.parent}")
+    if path.is_symlink():
+        raise RuntimeError(f"Refusing to modify a symlink: {path}")
+    original = path.read_bytes() if path.exists() else b""
+    if any(line.strip() == b"KlipperScreenCam" for line in original.splitlines()):
+        return False
+    if path.exists():
+        backup = path.with_name(path.name + ".ksc-backup")
+        try:
+            with backup.open("xb") as stream:
+                stream.write(original)
+        except FileExistsError:
+            pass  # Keep the original backup on repeated installation.
+    newline = b"\r\n" if b"\r\n" in original else b"\n"
+    addition = (newline if original and not original.endswith(b"\n") else b"")
+    addition += b"KlipperScreenCam" + newline
+    with path.open("ab") as stream:
+        stream.write(addition)
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("install", "uninstall"))
@@ -71,6 +96,10 @@ def main():
     parser.add_argument("--enable", action="store_true", help="Enable and start the new service")
     parser.add_argument("--klipperscreen-service", default="KlipperScreen.service",
                         help="Use 'none' for an independently managed X11 session")
+    parser.add_argument("--moonraker-data-dir", type=Path,
+                        help="Moonraker data directory; defaults to parent of --config-dir")
+    parser.add_argument("--skip-moonraker-registration", action="store_true",
+                        help="Do not modify the Moonraker service allowlist")
     args = parser.parse_args()
     if sys.platform != "linux":
         raise RuntimeError("The installer supports Linux with apt/systemd only")
@@ -86,6 +115,7 @@ def main():
         run("sudo", "rm", "--", UNIT)
         run("sudo", "systemctl", "daemon-reload")
         print("Service removed. Configuration, translations and source files were retained.")
+        print("If no longer needed, remove only KlipperScreenCam from moonraker.asvc and restart Moonraker.")
         return 0
 
     config_dir = args.config_dir.expanduser().resolve()
@@ -120,6 +150,14 @@ def main():
         run("systemd-analyze", "verify", staged)
         run("sudo", "install", "-m", "0644", "--", staged, UNIT)
     run("sudo", "systemctl", "daemon-reload")
+    if not args.skip_moonraker_registration:
+        data_dir = (args.moonraker_data_dir.expanduser().absolute()
+                    if args.moonraker_data_dir else config_dir.parent)
+        changed = register_moonraker_service(data_dir)
+        print("Moonraker service allowlist:", data_dir / "moonraker.asvc",
+              "(added)" if changed else "(already registered)")
+        print("Restart the matching Moonraker service at a suitable time to load the allowlist.")
+        print("  sudo systemctl restart moonraker  # adjust for a custom instance")
     if args.enable:
         run("sudo", "systemctl", "enable", "--now", UNIT.name)
     else:

@@ -18,5 +18,9 @@
   "reconnecting": "ارتباط با دوربین قطع شد. در حال اتصال مجدد…",
   "camera_unavailable": "پخش دوربین در دسترس نیست. برای تلاش مجدد یک دوربین انتخاب کنید.",
   "server_unavailable": "Moonraker در دسترس نیست. تلاش مجدد…",
-  "unsupported_stream": "این نوع پخش قابل نمایش نیست. پخش HTTP MJPEG لازم است."
+  "unsupported_stream": "این نوع پخش قابل نمایش نیست. پخش HTTP MJPEG لازم است.",
+  "fps_limit": "محدودیت‌های فریم",
+  "fps_unlimited": "نامحدود",
+  "fps_source": "منبع",
+  "fps_forwarded": "ارسال‌شده"
 }

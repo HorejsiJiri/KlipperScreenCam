@@ -18,5 +18,9 @@
   "reconnecting": "Utracono połączenie z kamerą. Ponowne łączenie…",
   "camera_unavailable": "Strumień kamery jest niedostępny. Wybierz kamerę, aby spróbować ponownie.",
   "server_unavailable": "Moonraker jest niedostępny. Ponowna próba…",
-  "unsupported_stream": "Nie można wyświetlić tego typu strumienia. Wymagany jest strumień HTTP MJPEG."
+  "unsupported_stream": "Nie można wyświetlić tego typu strumienia. Wymagany jest strumień HTTP MJPEG.",
+  "fps_limit": "Limity klatek",
+  "fps_unlimited": "Bez limitu",
+  "fps_source": "Źródło",
+  "fps_forwarded": "Przekazywane"
 }

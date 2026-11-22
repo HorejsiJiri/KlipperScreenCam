@@ -17,6 +17,7 @@ from gi.repository import Gtk, GLib, WebKit2
 from .i18n import load_language, html_language
 from .moonraker import list_cameras, startup_camera
 from .theme import klipperscreen_settings, theme_directory, icon_data, palette
+from .stream import StreamProxy
 
 LOG = logging.getLogger(__name__)
 
@@ -29,6 +30,8 @@ class Viewer(Gtk.Window):
         self.loading = False
         self.stopped = False
         self.cameras = []
+        self.streams = StreamProxy(timeout=settings.request_timeout, max_fps=settings.max_fps)
+        self.stream_generation = -1
         self.appearance_signature = None
         self.messages = {}
         self.set_decorated(False)
@@ -40,8 +43,13 @@ class Viewer(Gtk.Window):
         self.manager.connect("script-message-received::ksc", self.message)
         self.manager.register_script_message_handler("ksc")
         self.web = WebKit2.WebView(user_content_manager=self.manager)
-        self.web.get_settings().set_hardware_acceleration_policy(
-            WebKit2.HardwareAccelerationPolicy.NEVER)
+        acceleration = {
+            "off": WebKit2.HardwareAccelerationPolicy.NEVER,
+            "auto": WebKit2.HardwareAccelerationPolicy.ON_DEMAND,
+            "on": WebKit2.HardwareAccelerationPolicy.ALWAYS,
+        }[settings.hardware_acceleration]
+        self.web.get_settings().set_hardware_acceleration_policy(acceleration)
+        LOG.info("WebKit hardware acceleration requested: %s", settings.hardware_acceleration)
         self.web.connect("context-menu", lambda *_: True)
         self.web.connect("load-changed", self.loaded)
         self.web.connect("web-process-terminated", self.web_terminated)
@@ -51,9 +59,13 @@ class Viewer(Gtk.Window):
         self.web.load_html((root / "web/index.html").read_text(encoding="utf-8"),
                            settings.web_url + "/")
         GLib.timeout_add_seconds(settings.poll_seconds, self.update_appearance)
+        GLib.timeout_add_seconds(2, self.update_stream_stats)
 
     def close(self, *_):
+        if self.stopped:
+            return
         self.stopped = True
+        self.streams.close()
         Gtk.main_quit()
 
     def javascript(self, function, data):
@@ -71,6 +83,8 @@ class Viewer(Gtk.Window):
     def loaded(self, _web, event):
         if event == WebKit2.LoadEvent.STARTED:
             self.ready = False
+            self.stream_generation = -1
+            self.streams.stop()
         elif event == WebKit2.LoadEvent.FINISHED:
             self.ready = True
             self.appearance_signature = None
@@ -80,14 +94,24 @@ class Viewer(Gtk.Window):
                 "hideCursor": self.settings.hide_cursor,
                 "hideNameSingle": self.settings.hide_name_single,
                 "startPaused": self.settings.start_paused,
+                "maxFps": self.streams.max_fps,
+                "configuredMaxFps": self.settings.max_fps,
                 "retryInitial": self.settings.retry_initial,
                 "retryMax": self.settings.retry_max,
             })
             self.update_appearance()
             self.load_cameras()
 
+    def update_stream_stats(self):
+        if self.stopped:
+            return False
+        stats = self.streams.sample_stats()
+        self.javascript("KSC.setStreamStats", stats)
+        return True
+
     def web_terminated(self, _web, reason):
         LOG.error("Web renderer exited (%s); reloading", reason)
+        self.streams.stop()
         self.ready = False
         GLib.timeout_add_seconds(3, self.reload_web)
 
@@ -99,7 +123,35 @@ class Viewer(Gtk.Window):
     def message(self, _manager, result):
         try:
             data = json.loads(result.get_js_value().to_string())
-            if data.get("action") == "selected":
+            if data.get("action") == "stream":
+                generation = data.get("generation")
+                if (type(generation) is not int or not 0 <= generation <= 2**53
+                        or generation < self.stream_generation):
+                    return
+                self.stream_generation = generation
+                uid = data.get("uid")
+                if uid is None:
+                    self.streams.stop()
+                    self.javascript("KSC.streamStopped", {"generation": generation})
+                    return
+                camera = next((camera for camera in self.cameras
+                               if camera["uid"] == uid and camera["supported"]), None)
+                if camera is None:
+                    self.streams.stop()
+                    self.javascript("KSC.streamFailed", {"generation": generation})
+                    return
+                url = self.streams.prepare(camera["url"])
+                self.javascript("KSC.streamReady", {"generation": generation, "url": url})
+            elif data.get("action") == "fps":
+                value = data.get("value")
+                if value is not None and (type(value) is not int or value not in (10, 20, 30, self.settings.max_fps)):
+                    raise ValueError("Invalid display FPS choice")
+                if "value" not in data:
+                    raise ValueError("Missing display FPS choice")
+                self.streams.set_max_fps(value)
+                self.javascript("KSC.setFps", {"value": value})
+                LOG.info("Local FPS limit: %s", "unlimited" if value is None else value)
+            elif data.get("action") == "selected":
                 uid = data.get("uid")
                 if any(camera["uid"] == uid for camera in self.cameras):
                     LOG.info("Camera selected: %s", uid)

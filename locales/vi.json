@@ -18,5 +18,9 @@
   "reconnecting": "Mất kết nối với camera. Đang kết nối lại…",
   "camera_unavailable": "Luồng camera không khả dụng. Chọn camera để thử lại.",
   "server_unavailable": "Moonraker không khả dụng. Đang thử lại…",
-  "unsupported_stream": "Không thể hiển thị loại luồng này. Cần có luồng HTTP MJPEG."
+  "unsupported_stream": "Không thể hiển thị loại luồng này. Cần có luồng HTTP MJPEG.",
+  "fps_limit": "Giới hạn khung hình",
+  "fps_unlimited": "Không giới hạn",
+  "fps_source": "Nguồn",
+  "fps_forwarded": "Đã chuyển tiếp"
 }

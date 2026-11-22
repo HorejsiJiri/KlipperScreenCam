@@ -18,5 +18,9 @@
   "reconnecting": "Връзката с камерата е прекъсната. Повторно свързване…",
   "camera_unavailable": "Потокът от камерата не е наличен. Изберете камера за нов опит.",
   "server_unavailable": "Moonraker не е достъпен. Нов опит…",
-  "unsupported_stream": "Този тип поток не може да се показва. Необходим е HTTP MJPEG поток."
+  "unsupported_stream": "Този тип поток не може да се показва. Необходим е HTTP MJPEG поток.",
+  "fps_limit": "Ограничения на кадрите",
+  "fps_unlimited": "Неограничено",
+  "fps_source": "Източник",
+  "fps_forwarded": "Препратени"
 }

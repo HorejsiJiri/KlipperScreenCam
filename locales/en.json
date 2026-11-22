@@ -16,5 +16,9 @@
   "reconnecting": "Camera connection lost. Reconnecting…",
   "camera_unavailable": "The camera stream is unavailable. Select a camera to retry.",
   "server_unavailable": "Moonraker is unavailable. Retrying…",
-  "unsupported_stream": "This stream type cannot be displayed. An HTTP MJPEG stream is required."
+  "unsupported_stream": "This stream type cannot be displayed. An HTTP MJPEG stream is required.",
+  "fps_limit": "Frame limits",
+  "fps_unlimited": "Unlimited",
+  "fps_source": "Source",
+  "fps_forwarded": "Forwarded"
 }

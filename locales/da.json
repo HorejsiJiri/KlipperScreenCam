@@ -18,5 +18,9 @@
   "reconnecting": "Forbindelsen til kameraet blev afbrudt. Opretter forbindelse igen…",
   "camera_unavailable": "Kamerastreamen er ikke tilgængelig. Vælg et kamera for at prøve igen.",
   "server_unavailable": "Moonraker er ikke tilgængelig. Prøver igen…",
-  "unsupported_stream": "Denne streamtype kan ikke vises. Der kræves en HTTP MJPEG-stream."
+  "unsupported_stream": "Denne streamtype kan ikke vises. Der kræves en HTTP MJPEG-stream.",
+  "fps_limit": "Billedgrænser",
+  "fps_unlimited": "Ubegrænset",
+  "fps_source": "Kilde",
+  "fps_forwarded": "Videresendt"
 }

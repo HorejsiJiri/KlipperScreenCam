@@ -18,5 +18,9 @@
   "reconnecting": "Ühendus kaameraga katkes. Ühendan uuesti…",
   "camera_unavailable": "Kaamera voog pole saadaval. Uuesti proovimiseks vali kaamera.",
   "server_unavailable": "Moonraker pole saadaval. Proovin uuesti…",
-  "unsupported_stream": "Seda vootüüpi ei saa kuvada. Vajalik on HTTP MJPEG voog."
+  "unsupported_stream": "Seda vootüüpi ei saa kuvada. Vajalik on HTTP MJPEG voog.",
+  "fps_limit": "Kaadripiirangud",
+  "fps_unlimited": "Piiramatu",
+  "fps_source": "Allikas",
+  "fps_forwarded": "Edastatud"
 }

@@ -18,5 +18,9 @@
   "reconnecting": "Povezava s kamero je prekinjena. Ponovno povezovanje…",
   "camera_unavailable": "Tok kamere ni na voljo. Za ponovni poskus izberi kamero.",
   "server_unavailable": "Moonraker ni na voljo. Ponovni poskus…",
-  "unsupported_stream": "Te vrste toka ni mogoče prikazati. Potreben je tok HTTP MJPEG."
+  "unsupported_stream": "Te vrste toka ni mogoče prikazati. Potreben je tok HTTP MJPEG.",
+  "fps_limit": "Omejitve sličic",
+  "fps_unlimited": "Neomejeno",
+  "fps_source": "Vir",
+  "fps_forwarded": "Posredovano"
 }

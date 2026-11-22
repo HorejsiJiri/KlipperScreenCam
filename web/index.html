@@ -44,9 +44,18 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
 .camera span { flex:1; min-width:0; overflow-wrap:anywhere; white-space:normal; text-align:left; }
 #menu[dir="rtl"] .camera, #menu[dir="rtl"] .camera span { text-align:right; }
 #message { font-size:20px; padding:12px 0; overflow-wrap:anywhere; }
-#stream-toggle { width:100%; min-height:62px; margin:12px 0 0; padding:10px;
-  font:22px sans-serif; color:var(--text); background:var(--bg);
-  border:2px solid var(--lines); border-radius:8px; }
+#stream-toggle { margin:12px 0 0; color:#ef5350; --accent:#ef5350; }
+#stream-toggle .toggle-icon { position:relative; width:42px; height:42px; flex:0 0 42px; }
+#stream-toggle img { filter:brightness(0) saturate(100%) invert(43%) sepia(87%) saturate(1374%) hue-rotate(329deg) brightness(101%) contrast(88%); }
+#stream-toggle svg { position:absolute; inset:0; width:100%; height:100%; }
+#stream-toggle line { stroke:currentColor; stroke-width:8; stroke-linecap:round; }
+#fps-controls { margin-top:10px; }
+#fps-stats { font-size:18px; margin:4px 0; line-height:1.4; }
+#fps-label { font-size:20px; margin-bottom:0; }
+#fps-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+#fps-options button { min-height:48px; padding:8px; font:20px sans-serif; color:var(--text);
+  background:var(--bg); border:1px solid var(--lines); border-radius:8px; }
+#fps-options button[aria-pressed="true"] { background:var(--active); border-width:2px; }
 #paused { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   display:flex; flex-direction:column; align-items:center; gap:20px;
   text-align:center; font-size:30px; font-weight:bold; color:var(--text); pointer-events:none; }
@@ -66,7 +75,15 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
 <div id="dismiss" hidden></div>
 <section id="menu" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
   <div id="heading"><span id="menu-title"></span><button id="close">×</button></div>
-  <div id="list"></div><button id="stream-toggle"></button><div id="message" hidden></div>
+  <div id="list"></div>
+  <button id="stream-toggle" class="camera">
+    <div class="toggle-icon"><img alt=""><svg id="toggle-slash" viewBox="0 0 128 128" aria-hidden="true"><line x1="14" y1="114" x2="114" y2="14"/></svg></div>
+    <span id="toggle-label"></span>
+  </button>
+  <div id="fps-controls"><div id="fps-label"></div><div id="fps-stats"></div>
+    <div id="fps-options" role="group"></div>
+  </div>
+  <div id="message" hidden></div>
 </section>
 <script>
 "use strict";
@@ -74,6 +91,8 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
   const $=selector=>document.querySelector(selector);
   const video=$("#video"),title=$("#title"),gear=$("#gear"),menu=$("#menu");
   let cameras=[],selected=null,cameraIcon="",retryTimer=null,errorKey="",paused=false;
+  let streamGeneration=0,stopAcknowledged=false,maxFps=15;
+  let streamStats={sourceFps:0,forwardedFps:0},configuredMaxFps=15,fpsChoicesKey="";
   let texts={},options={menuWidth:410,gearSize:88,hideCursor:true,hideNameSingle:true,startPaused:false,retryInitial:2,retryMax:30};
   let retryDelay=options.retryInitial;
   const t=key=>texts[key]||key;
@@ -137,16 +156,18 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
   function startStream() {
     clearTimeout(retryTimer);
     const camera=current();
+    const generation=++streamGeneration;
+    stopAcknowledged=false;
     video.removeAttribute("src");
     updatePauseControls();
-    if(paused) return;
-    if(!camera) return;
-    if(!camera.supported) { setError("unsupported_stream"); return; }
-    setError("");
+    const active=!paused && !!camera?.supported;
+    if(!paused && camera && !camera.supported) setError("unsupported_stream");
+    else setError("");
     sizeVideo();
-    const url=new URL(camera.url,document.baseURI);
-    url.searchParams.set("_ksc_retry",Date.now().toString());
-    video.src=url.href;
+    const bridge=window.webkit?.messageHandlers?.ksc;
+    if(!bridge) { setError("camera_unavailable"); return; }
+    // Only the Python host owns the real camera connection and can stop it.
+    bridge.postMessage(JSON.stringify({action:"stream",uid:active?camera.uid:null,generation}));
   }
   function choose(uid,resume=true) {
     if(!cameras.some(camera=>camera.uid===uid)) return;
@@ -159,10 +180,36 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
     showMenu(false);
     window.webkit?.messageHandlers?.ksc?.postMessage(JSON.stringify({action:"selected",uid}));
   }
+  function updateFpsControls() {
+    $("#fps-label").textContent=t("fps_limit")+":";
+    $("#fps-stats").textContent=t("fps_source")+": "+streamStats.sourceFps.toFixed(0)+
+      " FPS · "+t("fps_forwarded")+": "+streamStats.forwardedFps.toFixed(0)+" FPS";
+    const numbers=[...new Set([10,20,30,...(configuredMaxFps===null?[]:[configuredMaxFps])])].sort((a,b)=>a-b);
+    const key=numbers.join(",");
+    const group=$("#fps-options");
+    if(key!==fpsChoicesKey) {
+      group.replaceChildren();
+      [...numbers,null].forEach(value=>{
+        const button=document.createElement("button");
+        button.dataset.fps=value===null?"unlimited":String(value);
+        if(value===null) button.style.gridColumn="span "+(3-numbers.length%3);
+        button.onclick=()=>window.webkit?.messageHandlers?.ksc?.postMessage(JSON.stringify({action:"fps",value}));
+        group.append(button);
+      });
+      fpsChoicesKey=key;
+    }
+    group.setAttribute("aria-label",t("fps_limit"));
+    group.querySelectorAll("button").forEach(button=>{
+      const value=button.dataset.fps==="unlimited"?null:Number(button.dataset.fps);
+      button.textContent=value===null?t("fps_unlimited"):value+" FPS";
+      button.setAttribute("aria-pressed",String(value===maxFps));
+    });
+  }
   function updatePauseControls() {
-    $("#stream-toggle").textContent=t(paused?"resume_stream":"pause_stream");
+    $("#toggle-label").textContent=t(paused?"resume_stream":"pause_stream");
+    $("#toggle-slash").toggleAttribute("hidden",paused);
     $("#pause-label").textContent=t("stream_paused");
-    $("#paused").hidden=!paused;
+    $("#paused").hidden=!paused || !stopAcknowledged;
     $("#stream-toggle").disabled=!selected;
   }
   $("#stream-toggle").onclick=()=>{
@@ -191,16 +238,41 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
     configure(data) {
       options={...options,...data};
       paused=options.startPaused;
+      if(Object.hasOwn(data,"maxFps")) maxFps=data.maxFps;
+      if(Object.hasOwn(data,"configuredMaxFps")) configuredMaxFps=data.configuredMaxFps;
+      updateFpsControls();
       retryDelay=options.retryInitial;
       document.body.classList.toggle("hide-cursor",options.hideCursor);
       document.documentElement.style.setProperty("--gear-size",options.gearSize+"px");
       sizeVideo();
       showMenu(!menu.hidden);
     },
+    setStreamStats(data) {
+      streamStats=data;
+      maxFps=data.maxFps;
+      updateFpsControls();
+    },
+    setFps(data) {
+      maxFps=data.value;
+      updateFpsControls();
+    },
     setCameras(data) {
       cameras=data.cameras;
       if(cameras.length) choose(data.preferred||cameras[0].uid,false);
-      else { selected=null; video.removeAttribute("src"); drawList(); showMenu(false); setError("no_cameras"); }
+      else { selected=null; startStream(); drawList(); showMenu(false); setError("no_cameras"); }
+    },
+    streamReady(data) {
+      if(data.generation!==streamGeneration || paused) return;
+      video.src=data.url;
+    },
+    streamStopped(data) {
+      if(data.generation!==streamGeneration) return;
+      stopAcknowledged=true;
+      updatePauseControls();
+    },
+    streamFailed(data) {
+      if(data.generation!==streamGeneration) return;
+      setError("camera_unavailable");
     },
     setAppearance(data) {
       if(data.messages) texts=data.messages;
@@ -213,12 +285,14 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
         gear.querySelector("img").src=data.icons.settings;
         cameraIcon=data.icons.camera;
         $("#pause-icon img").src=data.icons.camera;
+        $("#stream-toggle img").src=data.icons.camera;
       }
       $("#menu-title").textContent=t("menu_title");
       gear.setAttribute("aria-label",t("choose_camera"));
       $("#close").setAttribute("aria-label",t("close_menu"));
       setError(errorKey);
       updatePauseControls();
+      updateFpsControls();
       drawList();
     },
     error:setError,

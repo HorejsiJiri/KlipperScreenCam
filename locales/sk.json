@@ -18,5 +18,9 @@
   "reconnecting": "Spojenie s kamerou bolo prerušené. Obnovujem…",
   "camera_unavailable": "Obraz kamery nie je dostupný. Vyber kameru a skús to znova.",
   "server_unavailable": "Moonraker nie je dostupný. Skúšam znova…",
-  "unsupported_stream": "Tento typ streamu sa nedá zobraziť. Je potrebný HTTP MJPEG stream."
+  "unsupported_stream": "Tento typ streamu sa nedá zobraziť. Je potrebný HTTP MJPEG stream.",
+  "fps_limit": "Limity snímok",
+  "fps_unlimited": "Neobmedzene",
+  "fps_source": "Zdroj",
+  "fps_forwarded": "Odosielané"
 }

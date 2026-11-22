@@ -6,10 +6,11 @@ Keep printer controls on one HDMI screen and a selected camera on the other.
 [Český návod](README.cs.md) · [Second HDMI display and touch setup](docs/SECOND_DISPLAY.cs.md) ·
 [Deployment](docs/DEPLOY.cs.md) · [Translations](docs/TRANSLATIONS.cs.md)
 
-**Version 0.2.0.** The standalone 0.1.x application was deployed on a Raspberry Pi 5,
-Debian 13 (Trixie), X11 and two 1024 × 600 touch displays. The user confirmed video,
-controls and automatic startup after the documented systemd fix.
-This release adds the full upstream locale set; the new translations still need native-speaker review.
+**Version 0.3.0 — test candidate.** New live FPS controls await target validation.
+The preceding 0.2.3 version was tested as follows: Video, touch controls and automatic startup were confirmed on a
+Raspberry Pi 5, Debian 13 (Trixie), X11 and two 1024 × 600 touch displays. Actual
+stream shutdown was verified, and the user confirmed smooth video with the default
+15 FPS limit. New translations still need native-speaker review.
 See [verification](docs/VERIFICATION.cs.md) and [release checks](RELEASE_CHECKS.md).
 
 ## Features
@@ -18,7 +19,7 @@ See [verification](docs/VERIFICATION.cs.md) and [release checks](RELEASE_CHECKS.
 - A fixed startup camera by exact name or UID, independent of the Mainsail web view.
 - Full-window video preserving aspect ratio, with transparent name/settings overlays.
 - A touch menu at the top-right edge, scrollable camera list and equally sized entries.
-- Pause the local video stream to reduce local work; a crossed-out camera shows “Video off”.
+- Stop the local camera connection to reduce local work; a crossed-out camera shows “Video off” only after the Python host confirms shutdown.
   Selecting any camera, including the same one, starts a new stream connection.
 - With one enabled camera, hide its name but keep the menu accessible for pause/resume.
 - GTK-computed colors and SVG icons from the selected local KlipperScreen theme.
@@ -53,7 +54,6 @@ python3 launcher.py --list-cameras
 
 The installer installs dependencies, validates the generated systemd unit and preserves
 an existing configuration. By default it does **not** start or enable the service.
-It no longer generates the invalid quoted WorkingDirectory from the original 0.1.0 installer.
 
 If migrating from the earlier shared startup script, first follow
 [migration instructions](docs/MIGRATION.cs.md). Preserve HDMI and touch setup and disable
@@ -77,6 +77,16 @@ sudo systemctl enable KlipperScreenCam
 For an independently managed X11 session, `--klipperscreen-service none` omits the service dependency.
 Run the app from its checkout; `pip install` is not the supported deployment method.
 
+## Moonraker service control
+
+The installer adds `KlipperScreenCam` to `<Moonraker data directory>/moonraker.asvc`
+without duplicates or removing existing entries, keeping a first-change backup.
+Restart the matching Moonraker service manually during initial setup.
+The service can then be restarted using `POST /machine/services/restart` with
+`{"service":"KlipperScreenCam"}`, subject to normal Moonraker authorization.
+See the [step-by-step guide](docs/MOONRAKER.cs.md). Use `--moonraker-data-dir PATH` for a custom data directory, or
+`--skip-moonraker-registration` to leave the allowlist unchanged.
+
 ## Configure
 
 Edit `~/printer_data/config/KlipperScreenCam.conf` in Mainsail or a text editor.
@@ -96,6 +106,7 @@ height = 600
 hide_name_single_camera = true
 
 [stream]
+max_fps = 15
 start_paused = false
 ```
 
@@ -139,7 +150,7 @@ WebRTC/HLS/RTSP, Wayland and direct `/dev/video*` access are not supported.
 Reported stream failures trigger reconnect; a silent stall on an open HTTP connection may not
 raise an image error. Reselecting the same camera forces a reconnect. Multiple viewers add
 decoding/network load; measure it on your hardware. Menu geometry stays ours even when colors match a theme.
-Native GTK/WebKitGTK, fonts and new locale rendering still need target testing for this release.
+All locales/fonts, themes and failure scenarios have not been exhaustively tested on the target.
 
 ## Maintenance
 
@@ -159,4 +170,34 @@ See [update and rollback](docs/UPDATE.cs.md), [test plan](docs/TESTING.cs.md) an
 
 KlipperScreenCam is not an official KlipperScreen component. Theme SVG files are read from
 the user's existing installation and are not redistributed here; bundled fallback icons are original.
-The project owner's license choice is pending. No repository has been published automatically.
+The project owner's license choice is pending. See RELEASE_CHECKS.md for the exact published/local verification status.
+
+## Stream-off semantics
+
+The Python host owns one cancellable upstream HTTP connection and exposes a random, single-use
+loopback URL to WebKit. Video off closes the camera TCP socket and the local downstream socket.
+It does not rely on removing img.src. Stale browser requests receive HTTP 410 and cannot restart
+the camera. Switching cameras closes the previous connection. Other camera clients and Crowsnest
+remain independent. The loopback transport adds a local relay, not another video decoder.
+
+## Optional GPU rendering
+
+Set `[display] hardware_acceleration = on` to request accelerated WebKit rendering,
+`auto` for on-demand, or `off` for the original behavior. Missing values default to off.
+This does not guarantee hardware MJPEG decoding. Compare CPU and smoothness on the target;
+see [the acceleration guide](docs/ACCELERATION.cs.md). Restart KlipperScreenCam after changes.
+
+## Local FPS limit
+
+Set `max_fps = 15` in `[stream]` (default 15; range 1–120 or `unlimited`). Complete compressed
+frames are dropped without re-encoding before WebKit. The original upstream stream
+is still read; Mainsail is unaffected. Restart the service after changing configuration.
+The user confirmed smooth video at 15 FPS; CPU samples are documented in [verification](docs/VERIFICATION.cs.md).
+
+The touch menu offers 10, 20, 30 FPS and Unlimited. Changes apply immediately,
+without reconnecting or resuming paused video, and last until service restart.
+Restart restores `max_fps` from configuration. A custom configured numeric limit is inserted as an additional sorted preset,
+without duplicates. Numeric buttons have equal widths; Unlimited fills the rest
+of the second row. The menu order is cameras, video toggle, frame-limit heading,
+measured source/forwarded FPS, then preset buttons.
+Unlimited forwards all available source frames and may increase CPU use.

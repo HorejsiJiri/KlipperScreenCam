@@ -18,5 +18,9 @@
   "reconnecting": "カメラとの接続が切れました。再接続中…",
   "camera_unavailable": "カメラの映像を取得できません。カメラを選択して再試行してください。",
   "server_unavailable": "Moonrakerに接続できません。再試行中…",
-  "unsupported_stream": "この形式の映像は表示できません。HTTP MJPEGストリームが必要です。"
+  "unsupported_stream": "この形式の映像は表示できません。HTTP MJPEGストリームが必要です。",
+  "fps_limit": "フレーム数制限",
+  "fps_unlimited": "無制限",
+  "fps_source": "入力",
+  "fps_forwarded": "転送"
 }

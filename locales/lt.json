@@ -18,5 +18,9 @@
   "reconnecting": "Ryšys su kamera nutrūko. Jungiamasi iš naujo…",
   "camera_unavailable": "Kameros srautas nepasiekiamas. Pasirinkite kamerą ir bandykite dar kartą.",
   "server_unavailable": "Moonraker nepasiekiamas. Bandoma dar kartą…",
-  "unsupported_stream": "Šio tipo srauto rodyti negalima. Reikalingas HTTP MJPEG srautas."
+  "unsupported_stream": "Šio tipo srauto rodyti negalima. Reikalingas HTTP MJPEG srautas.",
+  "fps_limit": "Kadrų ribos",
+  "fps_unlimited": "Neribota",
+  "fps_source": "Šaltinis",
+  "fps_forwarded": "Persiųsta"
 }

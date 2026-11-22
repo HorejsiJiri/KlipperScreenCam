@@ -18,5 +18,9 @@
   "reconnecting": "Veza s kamerom je prekinuta. Ponovno povezivanje…",
   "camera_unavailable": "Prijenos kamere nije dostupan. Odaberi kameru za ponovni pokušaj.",
   "server_unavailable": "Moonraker nije dostupan. Pokušavam ponovno…",
-  "unsupported_stream": "Ova vrsta prijenosa ne može se prikazati. Potreban je HTTP MJPEG prijenos."
+  "unsupported_stream": "Ova vrsta prijenosa ne može se prikazati. Potreban je HTTP MJPEG prijenos.",
+  "fps_limit": "Ograničenja sličica",
+  "fps_unlimited": "Neograničeno",
+  "fps_source": "Izvor",
+  "fps_forwarded": "Proslijeđeno"
 }

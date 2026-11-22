@@ -18,5 +18,9 @@
   "reconnecting": "Веза са камером је прекинута. Поновно повезивање…",
   "camera_unavailable": "Стрим камере није доступан. Изабери камеру за нови покушај.",
   "server_unavailable": "Moonraker није доступан. Покушавам поново…",
-  "unsupported_stream": "Овај тип стрима не може да се прикаже. Потребан је HTTP MJPEG стрим."
+  "unsupported_stream": "Овај тип стрима не може да се прикаже. Потребан је HTTP MJPEG стрим.",
+  "fps_limit": "Ограничења кадрова",
+  "fps_unlimited": "Неограничено",
+  "fps_source": "Извор",
+  "fps_forwarded": "Прослеђено"
 }

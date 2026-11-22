@@ -18,5 +18,9 @@
   "reconnecting": "摄像头连接已断开。正在重新连接…",
   "camera_unavailable": "摄像头视频流不可用。请选择摄像头重试。",
   "server_unavailable": "Moonraker 不可用。正在重试…",
-  "unsupported_stream": "无法显示此类型的视频流。需要 HTTP MJPEG 视频流。"
+  "unsupported_stream": "无法显示此类型的视频流。需要 HTTP MJPEG 视频流。",
+  "fps_limit": "帧率限制",
+  "fps_unlimited": "不限",
+  "fps_source": "来源",
+  "fps_forwarded": "转发"
 }

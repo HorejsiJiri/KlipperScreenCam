@@ -18,5 +18,9 @@
   "reconnecting": "Verbinding met de camera verbroken. Opnieuw verbinden…",
   "camera_unavailable": "De camerastream is niet beschikbaar. Kies een camera om het opnieuw te proberen.",
   "server_unavailable": "Moonraker is niet beschikbaar. Opnieuw proberen…",
-  "unsupported_stream": "Dit streamtype kan niet worden weergegeven. Een HTTP MJPEG-stream is vereist."
+  "unsupported_stream": "Dit streamtype kan niet worden weergegeven. Een HTTP MJPEG-stream is vereist.",
+  "fps_limit": "Beeldlimieten",
+  "fps_unlimited": "Onbeperkt",
+  "fps_source": "Bron",
+  "fps_forwarded": "Doorgestuurd"
 }

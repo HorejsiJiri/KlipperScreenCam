@@ -18,5 +18,9 @@
   "reconnecting": "攝影機連線已中斷。正在重新連線…",
   "camera_unavailable": "攝影機串流無法使用。請選擇攝影機重試。",
   "server_unavailable": "Moonraker 無法使用。正在重試…",
-  "unsupported_stream": "無法顯示此類型的串流。需要 HTTP MJPEG 串流。"
+  "unsupported_stream": "無法顯示此類型的串流。需要 HTTP MJPEG 串流。",
+  "fps_limit": "幀率限制",
+  "fps_unlimited": "不限",
+  "fps_source": "來源",
+  "fps_forwarded": "轉送"
 }

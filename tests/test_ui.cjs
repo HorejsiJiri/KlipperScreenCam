@@ -24,7 +24,17 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
     await page.setContent(html);
     await page.evaluate(({messages,icon})=>{
       window.events=[];
-      window.webkit={messageHandlers:{ksc:{postMessage:value=>events.push(JSON.parse(value))}}};
+      window.replyToStreams=true;
+      window.webkit={messageHandlers:{ksc:{postMessage:value=>{
+        const event=JSON.parse(value);
+        events.push(event);
+        if(event.action==="fps") queueMicrotask(()=>KSC.setFps({value:event.value}));
+        if(event.action==="stream" && replyToStreams) queueMicrotask(()=>{
+          if(event.uid===null) KSC.streamStopped({generation:event.generation});
+          else KSC.streamReady({generation:event.generation,
+            url:"http://camera.test/stream"+event.uid+"?session="+event.generation});
+        });
+      }}}};
       KSC.configure({menuWidth:410,hideNameSingle:true,hideCursor:true});
       KSC.setAppearance({messages,icons:{camera:icon,settings:icon}});
     },{messages,icon});
@@ -34,29 +44,90 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
     await page.locator("#gear").click();
     assert.equal(await page.locator("#menu").evaluate(element=>element.getBoundingClientRect().top),0);
     assert.equal(await page.locator("#gear").isVisible(),false);
-    await page.locator(".camera").first().click();
+    await page.locator("#list .camera").first().click();
     assert.equal(await page.locator("#title").textContent(),"Camera 1");
     assert.equal(await page.locator("#menu").isVisible(),false);
     const before=await page.locator("#video").getAttribute("src");
     await page.waitForTimeout(20);
     await page.locator("#gear").click();
-    await page.locator(".camera").first().click();
+    await page.locator("#list .camera").first().click();
     assert.notEqual(await page.locator("#video").getAttribute("src"),before);
 
     await page.locator("#gear").click();
+    const order=await page.locator("#menu").evaluate(menu=>{
+      const ids=["list","stream-toggle","fps-label","fps-stats","fps-options"];
+      return [...menu.querySelectorAll("[id]")].map(node=>node.id).filter(id=>ids.includes(id));
+    });
+    assert.deepEqual(order,["list","stream-toggle","fps-label","fps-stats","fps-options"]);
+    for(const [configured,expected] of [[15,["10","15","20","30","unlimited"]],
+        [20,["10","20","30","unlimited"]],[null,["10","20","30","unlimited"]],
+        [120,["10","20","30","120","unlimited"]]]) {
+      await page.evaluate(value=>KSC.configure({maxFps:value,configuredMaxFps:value}),configured);
+      assert.deepEqual(await page.locator("#fps-options button").evaluateAll(buttons=>buttons.map(b=>b.dataset.fps)),expected);
+      const rects=await page.locator("#fps-options button").evaluateAll(buttons=>buttons.map(b=>{
+        const r=b.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,right:r.right};
+      }));
+      assert.ok(rects.slice(0,3).every(r=>r.y===rects[0].y));
+      assert.ok(rects.slice(3).every(r=>r.y===rects[3].y && r.y>rects[0].y));
+      assert.ok(rects.slice(0,-1).every(r=>Math.abs(r.width-rects[0].width)<1));
+      assert.ok(Math.abs(rects.at(-1).right-rects[2].right)<1);
+      assert.equal(await page.locator("#fps-options [aria-pressed=true]").count(),1);
+    }
+    await page.evaluate(()=>KSC.configure({maxFps:15,configuredMaxFps:15}));
+    assert.equal(await page.locator("#stream-toggle").evaluate(b=>getComputedStyle(b).color),"rgb(239, 83, 80)");
+    assert.equal(await page.locator("#toggle-slash").isVisible(),true);
+    await page.locator('[data-fps="15"]').click();
+    assert.equal(await page.locator('[data-fps="15"]').getAttribute("aria-pressed"),"true");
+    await page.locator("#close").click();
+
+    const fpsSource=await page.locator("#video").getAttribute("src");
+    const streamCount=await page.evaluate(()=>events.filter(event=>event.action==="stream").length);
+    await page.locator("#gear").click();
+    for(const value of ["10","20","30","unlimited"]) {
+      await page.locator(`[data-fps="${value}"]`).click();
+      assert.equal(await page.locator(`[data-fps="${value}"]`).getAttribute("aria-pressed"),"true");
+      assert.equal(await page.locator("#fps-options [aria-pressed='true']").count(),1);
+      assert.equal(await page.locator("#video").getAttribute("src"),fpsSource);
+      assert.equal(await page.locator("#menu").isVisible(),true);
+    }
+    assert.equal(await page.evaluate(()=>events.filter(event=>event.action==="stream").length),streamCount);
+    assert.equal(await page.locator("#fps-label").textContent(),"Limity snímků:");
+    await page.evaluate(()=>KSC.setStreamStats({sourceFps:29.7,forwardedFps:10.1,maxFps:10}));
+    assert.equal(await page.locator("#fps-stats").textContent(),"Zdroj: 30 FPS · Předáváno: 10 FPS");
+    await page.evaluate(()=>KSC.setStreamStats({sourceFps:14.4,forwardedFps:14.5,maxFps:10}));
+    assert.equal(await page.locator("#fps-stats").textContent(),"Zdroj: 14 FPS · Předáváno: 15 FPS");
+    assert.equal(await page.locator('[data-fps="10"]').getAttribute("aria-pressed"),"true");
+    assert.equal(await page.locator("#video").getAttribute("src"),fpsSource);
+    await page.locator("#close").click();
+
+    await page.evaluate(()=>{ window.replyToStreams=false; });
+    await page.locator("#gear").click();
     await page.locator("#stream-toggle").click();
     assert.equal(await page.locator("#video").getAttribute("src"),null);
+    assert.equal(await page.locator("#paused").isVisible(),false);
+    await page.evaluate(()=>{
+      const stop=events.filter(event=>event.action==="stream").at(-1);
+      if(stop.uid!==null) throw Error("Pause did not ask the host to close the stream");
+      KSC.streamStopped({generation:stop.generation});
+      window.replyToStreams=true;
+    });
     assert.equal(await page.locator("#paused").isVisible(),true);
     assert.equal(await page.locator("#pause-label").textContent(),"Obraz vypnut");
     await page.locator("#gear").click();
-    assert.equal(await page.locator("#stream-toggle").textContent(),"Zapnout obraz");
+    await page.locator('[data-fps="10"]').click();
+    assert.equal(await page.locator("#paused").isVisible(),true);
+    assert.equal(await page.locator("#video").getAttribute("src"),null);
+    await page.locator("#close").click();
+    await page.locator("#gear").click();
+    assert.equal(await page.locator("#toggle-label").textContent(),"Zapnout obraz");
+    assert.equal(await page.locator("#toggle-slash").isVisible(),false);
     await page.locator("#stream-toggle").click();
     assert.ok(await page.locator("#video").getAttribute("src"));
 
     await page.locator("#gear").click();
     await page.locator("#stream-toggle").click();
     await page.locator("#gear").click();
-    await page.locator(".camera").first().click();
+    await page.locator("#list .camera").first().click();
     assert.ok(await page.locator("#video").getAttribute("src"));
     assert.equal(await page.locator("#paused").isVisible(),false);
 
@@ -71,14 +142,14 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
     const dimensions=await page.locator("#menu").evaluate(menu=>({
       width:menu.getBoundingClientRect().width,height:menu.getBoundingClientRect().height,
       scroll:menu.scrollHeight,client:menu.clientHeight,
-      heights:[...menu.querySelectorAll(".camera")].map(button=>button.getBoundingClientRect().height),
+      heights:[...menu.querySelectorAll("#list .camera")].map(button=>button.getBoundingClientRect().height),
     }));
     assert.ok(dimensions.width>=410 && dimensions.width<=1024);
     assert.ok(dimensions.height<=600);
     assert.ok(dimensions.scroll>dimensions.client);
     assert.ok(dimensions.heights.every(height=>height===dimensions.heights[0]));
-    await page.locator(".camera").last().scrollIntoViewIfNeeded();
-    await page.locator(".camera").last().click();
+    await page.locator("#list .camera").last().scrollIntoViewIfNeeded();
+    await page.locator("#list .camera").last().click();
     assert.equal(await page.locator("#title").textContent(),"Kamera 11");
 
     const source=await page.locator("#video").getAttribute("src");
@@ -95,6 +166,10 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
       const translation=JSON.parse(fs.readFileSync(path.join(root,"locales",filename),"utf8"));
       await page.evaluate(data=>KSC.setAppearance(data),{messages:translation,language:translation._meta.code.replaceAll("_","-")});
       assert.equal(await page.locator("#menu-title").textContent(),translation.menu_title);
+      assert.equal(await page.locator("[data-fps=unlimited]").textContent(),translation.fps_unlimited);
+      assert.ok((await page.locator("#fps-label").textContent()).startsWith(translation.fps_limit));
+      assert.ok((await page.locator("#fps-stats").textContent()).includes(translation.fps_source));
+      assert.ok((await page.locator("#fps-stats").textContent()).includes(translation.fps_forwarded));
       assert.equal(await page.locator("#menu").getAttribute("dir"),translation._meta.direction||"ltr");
       assert.equal(await page.locator("#video").getAttribute("src"),languageSource);
     }
@@ -105,7 +180,7 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
     },{data:arabic,cameras:[camera(1,"الكاميرا الأولى"),camera(2,"الكاميرا الثانية")]});
     await page.locator("#gear").click();
     assert.equal(await page.locator("#menu").evaluate(element=>getComputedStyle(element).direction),"rtl");
-    const positions=await page.locator(".camera").first().evaluate(button=>({
+    const positions=await page.locator("#list .camera").first().evaluate(button=>({
       image:button.querySelector("img").getBoundingClientRect().x,
       label:button.querySelector("span").getBoundingClientRect().x,
     }));
@@ -119,8 +194,18 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
     },{cameras:[camera(1)],preferred:"1"});
     assert.equal(await page.locator("#video").getAttribute("src"),null);
     assert.equal(await page.locator("#paused").isVisible(),true);
+    if(process.env.KSC_UI_SCREENSHOT) {
+      await page.evaluate(({messages,cameras})=>{
+        KSC.configure({startPaused:false,maxFps:15,configuredMaxFps:15});
+        KSC.setAppearance({messages,language:"cs"});
+        KSC.setCameras({cameras,preferred:"1"});
+        KSC.setStreamStats({sourceFps:30,forwardedFps:15,maxFps:15});
+      },{messages,cameras:[camera(1,"Tryska"),camera(2,"Celá tiskárna")]});
+      await page.locator("#gear").click();
+      await page.locator("#menu").screenshot({path:process.env.KSC_UI_SCREENSHOT});
+    }
     assert.deepEqual(errors,[]);
-    console.log("UI checks passed: selection, reconnect, pause/resume, single camera, scrolling, long labels, theme, escaped names, all locales and RTL.");
+    console.log("UI checks passed: live FPS/unlimited, paused FPS changes, selection, reconnect, pause/resume, single camera, scrolling, long labels, theme, escaped names, all locales and RTL.");
   } finally {
     await browser.close();
   }

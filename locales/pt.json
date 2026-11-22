@@ -18,5 +18,9 @@
   "reconnecting": "A ligação à câmara foi interrompida. A restabelecer ligação…",
   "camera_unavailable": "O fluxo da câmara não está disponível. Selecione uma câmara para tentar novamente.",
   "server_unavailable": "O Moonraker não está disponível. A tentar novamente…",
-  "unsupported_stream": "Não é possível apresentar este tipo de fluxo. É necessário um fluxo HTTP MJPEG."
+  "unsupported_stream": "Não é possível apresentar este tipo de fluxo. É necessário um fluxo HTTP MJPEG.",
+  "fps_limit": "Limites de fotogramas",
+  "fps_unlimited": "Sem limite",
+  "fps_source": "Origem",
+  "fps_forwarded": "Enviados"
 }

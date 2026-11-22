@@ -1,4 +1,4 @@
-# První nasazení archivu 0.2.0
+# První nasazení archivu 0.3.0
 
 Balíček neobsahuje osobní nastavení ani soubory z běžícího RPi. Na RPi je potřeba zachovat
 současné HDMI rozložení a mapování dotyků. Pro první zkoušku není potřeba restartovat celé RPi.
@@ -6,7 +6,7 @@ současné HDMI rozložení a mapování dotyků. Pro první zkoušku není pot�
 Pokud ještě nemáš připravený druhý monitor a jeho dotyk, nejdříve dokonči
 [SECOND_DISPLAY.cs.md](SECOND_DISPLAY.cs.md). Instalátor jejich konfiguraci nemění.
 
-1. Přenes `KlipperScreenCam-0.2.0.tar.gz` například přes WinSCP do domovského adresáře
+1. Přenes `KlipperScreenCam-0.3.0.tar.gz` například přes WinSCP do domovského adresáře
    uživatele tiskárny. Připoj se přes SSH jako stejný uživatel, který spouští KlipperScreen.
 
 2. Ověř, že již nemáš adresář `~/KlipperScreenCam` s jiným projektem nebo nastavením.
@@ -15,13 +15,13 @@ Pokud ještě nemáš připravený druhý monitor a jeho dotyk, nejdříve dokon
 
    ```bash
    cd ~
-   tar -xzf KlipperScreenCam-0.2.0.tar.gz
+   tar -xzf KlipperScreenCam-0.3.0.tar.gz
    cd ~/KlipperScreenCam
    bash scripts/install.sh
    ```
 
 3. Otevři `~/printer_data/config/KlipperScreenCam.conf` v Mainsailu nebo nano.
-   Pro současnou konfiguraci z chatu jsou připravené souřadnice druhého displeje
+   Výchozí konfigurace používá souřadnice druhého displeje
    `x = 1024`, `y = 0`, velikost `1024 × 600`, jazyk a motiv `auto`.
    Vyber výchozí kameru:
 
@@ -32,8 +32,9 @@ Pokud ještě nemáš připravený druhý monitor a jeho dotyk, nejdříve dokon
    ```
 
    Do `[main]` napiš `default_camera = UID` z výpisu. Můžeš použít i přesný název.
+   V sekci `[stream]` je výchozí `max_fps = 15`; pro vyšší limit lze nastavit 30.
 
-4. Jestli používáš náhled vytvořený v předchozím chatu, proveď postup
+4. Jestli přecházíš z původního společného náhledu, proveď postup
    [MIGRATION.cs.md](MIGRATION.cs.md). Zachovej příkazy pro monitory a dotyky;
    odstraňuje se jen staré automatické spuštění kamerové aplikace.
 
@@ -60,7 +61,54 @@ Při neúspěchu můžeš novou službu zastavit přes `sudo systemctl stop Klip
 a obnovit původní spouštěcí skript podle dokumentu MIGRATION. Odinstalace:
 `bash ~/KlipperScreenCam/scripts/uninstall.sh`.
 
-## Již nasazená verze 0.1.x
+## Ovládání služby přes Moonraker
 
-Funkční instalaci nepřepisuj archivem naslepo. Zachovej KlipperScreenCam.conf a zazálohuj
-zdrojový adresář. Pro řízenou aktualizaci a návrat použij [UPDATE.cs.md](UPDATE.cs.md).
+Instalátor automaticky doplní KlipperScreenCam do seznamu bez duplicit a zachová ostatní položky.
+Před první změnou existujícího souboru uloží moonraker.asvc.ksc-backup. Moonraker automaticky
+nerestartuje. Pro běžný datový
+adresář `~/printer_data` otevři:
+
+```bash
+nano ~/printer_data/moonraker.asvc
+```
+
+Ponech ostatní řádky a přidej samostatný řádek, pokud už v seznamu není:
+
+```text
+KlipperScreenCam
+```
+
+Název musí odpovídat velikostí písmen, bez `.service`. Ulož soubor a načti nový seznam:
+
+```bash
+sudo systemctl restart moonraker
+```
+
+Webové rozhraní může při restartu Moonrakeru krátce ztratit spojení. Tento krok
+proveď při prvním nastavení mimo probíhající tisk. U vlastní datové cesty nebo
+více instancí použij příslušný datový adresář a název služby Moonrakeru.
+
+Restart náhledu přes místní API Moonrakeru:
+
+```bash
+curl --fail-with-body -sS -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"service":"KlipperScreenCam"}' \
+  http://127.0.0.1:7125/machine/services/restart
+```
+
+Úspěšná odpověď obsahuje `"result":"ok"`. Ověř běh přes
+`systemctl is-active KlipperScreenCam`. Podle klienta může být služba dostupná také
+v nabídce systémových služeb Mainsailu; ověř to v konkrétní verzi rozhraní.
+Pokud API vyžaduje autentizaci, použij přihlášeného klienta nebo jeho běžné
+přihlašovací údaje; nevypínej autorizaci Moonrakeru. Oprávnění ke správě systémových
+služeb musí mít již nastavené samotný Moonraker.
+
+Automatické povolení lze vynechat přes `--skip-moonraker-registration`. Vlastní datový
+adresář zadej přes `--moonraker-data-dir /cesta/printer_data`; jinak se použije nadřazený
+adresář `--config-dir`. Výše uvedená ruční úprava slouží ke kontrole nebo doplnění.
+Při odinstalaci lze odstranit pouze řádek `KlipperScreenCam` a znovu načíst Moonraker.
+
+Oficiální dokumentace: [povolené služby](https://moonraker.readthedocs.io/en/latest/configuration/#allowed-services)
+a [restart přes API](https://moonraker.readthedocs.io/en/latest/external_api/machine/#restart-a-system-service).
+

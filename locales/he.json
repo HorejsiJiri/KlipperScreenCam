@@ -18,5 +18,9 @@
   "reconnecting": "החיבור למצלמה אבד. מתחבר מחדש…",
   "camera_unavailable": "זרם הווידאו של המצלמה אינו זמין. יש לבחור מצלמה כדי לנסות שוב.",
   "server_unavailable": "Moonraker אינו זמין. מנסה שוב…",
-  "unsupported_stream": "לא ניתן להציג זרם מסוג זה. נדרש זרם HTTP MJPEG."
+  "unsupported_stream": "לא ניתן להציג זרם מסוג זה. נדרש זרם HTTP MJPEG.",
+  "fps_limit": "מגבלות פריימים",
+  "fps_unlimited": "ללא הגבלה",
+  "fps_source": "מקור",
+  "fps_forwarded": "הועבר"
 }

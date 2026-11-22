@@ -18,5 +18,9 @@
   "reconnecting": "Connessione alla telecamera interrotta. Riconnessione…",
   "camera_unavailable": "Il flusso della telecamera non è disponibile. Seleziona una telecamera per riprovare.",
   "server_unavailable": "Moonraker non è disponibile. Nuovo tentativo…",
-  "unsupported_stream": "Questo tipo di flusso non può essere visualizzato. È necessario un flusso HTTP MJPEG."
+  "unsupported_stream": "Questo tipo di flusso non può essere visualizzato. È necessario un flusso HTTP MJPEG.",
+  "fps_limit": "Limiti fotogrammi",
+  "fps_unlimited": "Illimitato",
+  "fps_source": "Sorgente",
+  "fps_forwarded": "Inoltrati"
 }

@@ -26,6 +26,21 @@ class CoreTests(unittest.TestCase):
     def tearDown(self):
         self.temporary.cleanup()
 
+    def test_local_fps_configuration(self):
+        self.config.write_text("[stream]\n")
+        self.assertEqual(load(self.config).max_fps, 15)
+        self.config.write_text("[stream]\nmax_fps=15\n")
+        self.assertEqual(load(self.config).max_fps, 15)
+        for invalid in ("0", "121", "-1", "abc"):
+            self.config.write_text("[stream]\nmax_fps=" + invalid + "\n")
+            with self.assertRaises(ValueError):
+                load(self.config)
+
+    def test_unlimited_fps_configuration(self):
+        for value in ("unlimited", "UNLIMITED", " Unlimited "):
+            self.config.write_text("[stream]\nmax_fps=" + value + "\n")
+            self.assertIsNone(load(self.config).max_fps)
+
     def test_example_configuration(self):
         settings = load(ROOT / "config/KlipperScreenCam.conf")
         self.assertEqual((settings.width, settings.height), (1024, 600))
@@ -49,6 +64,20 @@ class CoreTests(unittest.TestCase):
     def test_paths_are_relative_to_configuration(self):
         self.config.write_text("[main]\nklipperscreen_directory=../KS\n")
         self.assertEqual(load(self.config).ks_directory, (self.directory / "../KS").resolve())
+
+    def test_old_configuration_keeps_acceleration_off(self):
+        self.assertEqual(load(self.config).hardware_acceleration, "off")
+
+    def test_acceleration_modes(self):
+        for mode in ("off", "auto", "on", "ON"):
+            with self.subTest(mode=mode):
+                self.config.write_text("[display]\nhardware_acceleration=" + mode + "\n")
+                self.assertEqual(load(self.config).hardware_acceleration, mode.lower())
+
+    def test_invalid_acceleration_mode_is_rejected(self):
+        self.config.write_text("[display]\nhardware_acceleration=enabled\n")
+        with self.assertRaisesRegex(ValueError, "hardware_acceleration"):
+            load(self.config)
 
     def test_invalid_url_rejected(self):
         self.config.write_text("[main]\nmoonraker_url=file:///etc/passwd\n")

@@ -1,42 +1,73 @@
-# Stav ověření — 0.2.0
+# Stav ověření — 0.3.0 (testovací sestavení)
 
-Datum: 2026-11-22. Rozlišujeme skutečné výsledky nasazení od místních testů.
+Datum: 2026-11-22. Výsledky cílového nasazení jsou oddělené od místních testů.
 
-## Potvrzeno uživatelem na cílovém RPi
+## Potvrzeno na cílovém RPi
 
-Prostředí: Raspberry Pi 5 Model B Rev 1.0, Debian GNU/Linux 13.8 (Trixie),
-KlipperScreen přes X11 a dva HDMI dotykové displeje 1024 × 600.
+Raspberry Pi 5 Model B Rev 1.0, Debian 13.8 Trixie, X11,
+dva HDMI dotykové displeje 1024 × 600, rozšířená plocha 2048 × 600.
 
-- Původní rozložení 2048 × 600 a mapování dotyků bylo zachováno při migraci.
-- Aplikace byla převedena ze společného skriptu na samostatnou systemd službu.
-- Instalátor 0.1.0 vytvořil neplatný WorkingDirectory s uvozovkami. Systemd jej odmítl.
-  Řádek byl odstraněn; aplikace jej nepotřebuje.
-- Po opravě služba hlásila active. Log potvrdil motiv z-bolt, češtinu a kameru z Moonrakeru.
-- Uživatel výslovně potvrdil funkční obraz a ovládání nového náhledu.
-- Uživatel potvrdil automatický start. Samostatný záznam bootu nebyl dodán.
+- Uživatel potvrdil obraz, ovládání a automatický start samostatné služby.
+- Zachováno rozložení displejů a mapování obou dotyků.
+- Výchozí kamera funguje podle přesného názvu i UID z Moonrakeru.
+- Vypnutí obrazu uzavírá přenos: doložen log uzavření a žádné TCP spojení hlavního
+  procesu. V krátkém vzorku celková zátěž klesla přibližně z 15 % na 2 %.
+- Nastavení akcelerace on bylo načteno a aplikace pokračovala v provozu.
+  Log potvrzuje požadovanou politiku, nikoli skutečné GPU dekódování.
+- Verze 0.2.3 s max_fps = 15 byla nasazena; uživatel výslovně potvrdil plynulý obraz.
 
-0.1.1 obsahuje opravu generátoru služby. 0.2.0 na ni navazuje doplněním jazyků a dokumentace.
-Běžící instalaci RPi tento krok neaktualizoval na 0.2.0.
+## Orientační CPU měření
 
-## Místní automatické kontroly 0.2.0
+Cam1, zapnutá politika akcelerace, jednosekundové vzorky top před/po místním limitu:
 
-- Testy konfigurace, překladů, výchozí kamery, nastavení KlipperScreenu a generování služby.
-- Shoda s 32 jazyky oficiálního upstreamu ve zdokumentovaném commitu.
-- Výběr všech jazyků, regionálních variant a aliasů, RTL/LTR a fallback do angličtiny.
-- JSON validace, shoda klíčů a kontrola duplicit; syntaxe Pythonu, Bash a JavaScriptu.
-- Testy rozhraní v headless prohlížeči: menu, výběr, nové spojení téže kamery,
-  pauza, zapnutí výběrem, jedna kamera, dlouhé názvy, rolování, změna barev bez restartu
-  streamu, skrytí kurzoru, bezpečné vykreslení názvů a přepnutí jazyka/RTL.
+| Metrika | Předchozí limit 30 FPS | Limit 15 FPS |
+|---|---:|---:|
+| WebKit, % jednoho jádra | 23,8 | 17,8 |
+| Python náhledu, % jednoho jádra | 6,9 | 5,9 |
+| Crowsnest Cam1, % jednoho jádra | 10,9 | 12,9 |
+| Celý CPU, % všech jader | 12,5 | 11,5 |
 
-Aktuální výsledky jsou v RELEASE_CHECKS.md. Linuxový CI test ověřuje generovanou jednotku
-přes skutečné systemd-analyze verify; na Windows se tato specifická kontrola přeskakuje.
+Nejde o dlouhodobý řízený benchmark. Vzorky naznačují snížení práce WebKitu;
+nelze z nich slibovat konkrétní úsporu na jiném zařízení. Crowsnest dodává původní
+stream, proto se jeho zátěž místním limitem přímo nesnižuje.
 
-## Co není potvrzené
+## Místní kontroly
 
-- Nových 30 překladů nebylo posouzeno rodilými mluvčími; jsou označené jako návrhy.
-- Úplná verze 0.2.0 a její RTL/CJK vykreslení ještě nebyly nasazeny na RPi.
-- Pokles CPU a ukončení síťového odběru při pauze nebyly externě změřeny.
-- Úplný souběh všech diváků a všechny druhy výpadků nemají kompletní testovací protokol.
-- Zhasnutí/probuzení obou výstupů podle DPMS ani všechny motivy nebyly potvrzené.
+- Konfigurace, jazyky, výchozí kamera, GTK nastavení a generování služby.
+- 32 jazykových variant, regionální aliasy, RTL metadata, JSON klíče a fallback.
+- Reálný nepřetržitý MJPEG server: skutečné zavření spojení a zastavení bajtů,
+  staré adresy, přepnutí kamery, limit snímků, zachování JPEG dat,
+  fragmentované části bez Content-Length a nezávislý druhý klient.
+- Browser testy: výběr, pauza, zapnutí výběrem, jedna kamera, dlouhé názvy,
+  posun, motiv bez restartu streamu, kurzor, bezpečné názvy a jazyky/RTL.
 
-Pilotní seznam je v TESTING.cs.md. Browser test nenahrazuje GTK/WebKitGTK test na RPi.
+Aktuální počet kontrol je v [RELEASE_CHECKS.md](../RELEASE_CHECKS.md).
+Windows přeskakuje skutečné systemd ověření; to spouští Linux CI.
+
+## Zbývá ověřit
+
+- Všech 30 nových překladů rodilými mluvčími, veškeré CJK/RTL fonty na RPi.
+- Všechny motivy, dlouhodobé výpadky, tiché zastavení kamery a souběhy klientů.
+- Zhasnutí/probuzení obou výstupů. DPMS sám nepozastavuje přenos.
+- Skutečnou GPU aktivitu a dlouhodobé CPU srovnání.
+- Moonraker správu služby podle nového návodu na cílové instalaci.
+
+Podrobnosti: [TESTING.cs.md](TESTING.cs.md), [FPS.cs.md](FPS.cs.md).
+
+## Nové v 0.2.4
+
+Přepínání limitu v menu a unlimited byly ověřeny místními testy skutečného přenosu
+a rozhraní. Nové ovládání zatím není ověřeno na cílovém GTK/WebKit. Výše uvedené
+výsledky RPi patří předchozí verzi 0.2.3.
+
+## Diagnostika 0.2.5
+
+Log RPi potvrdil přijetí unlimited, 10, 20 a 30 z menu. To samo neprokazuje změnu FPS.
+Nové počítadlo zdroje a předaných snímků čeká na ověření na RPi. Reálný místní
+server a test všech voleb potvrdily změnu počtu předaných snímků na stejném spojení.
+
+## Vzhled menu 0.3.0
+
+Nové pořadí, ikona a barva ovládání obrazu, vlastní řazené předvolby, rozměry a
+zarovnání tlačítek byly zkontrolovány browser testem i náhledem. Nové rozložení
+a ovládání vlastní hodnoty limitu na cílovém RPi ještě nejsou potvrzené.

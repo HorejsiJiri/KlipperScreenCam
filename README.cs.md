@@ -4,9 +4,10 @@ Samostatný dotykový kamerový displej pro tiskárny s Klipperem a Moonrakerem.
 Na jednom monitoru zůstává KlipperScreen, na druhém běží KlipperScreenCam.
 Přehrává existující HTTP MJPEG streamy; nemění nastavení kamer ani výběr ve webovém Mainsailu.
 
-**Verze 0.2.0.** Samostatnou aplikaci uživatel nasadil a potvrdil funkční obraz, ovládání
+**Verze 0.3.0 — k otestování.** Nové přepínání FPS ještě nebylo ověřeno na RPi.
+Předchozí samostatnou verzi 0.2.3 uživatel nasadil a potvrdil funkční obraz, ovládání
 a automatický start na RPi5 / Debianu 13 / X11 / dvou HDMI displejích 1024 × 600.
-Verze 0.2.0 přidává 32 jazykových variant; nové překlady ještě potřebují kontrolu rodilými mluvčími.
+Výchozí limit je 15 FPS; uživatel potvrdil plynulý obraz. Nové překlady ještě potřebují kontrolu rodilými mluvčími.
 Podrobné rozlišení ověřeného základu a nových změn je v [docs/VERIFICATION.cs.md](docs/VERIFICATION.cs.md).
 
 [English README](README.md)
@@ -61,6 +62,11 @@ Existující `KlipperScreenCam.conf` při opakované instalaci nepřepíše.
 Nespouštěj současně starý náhled z `start-displays.sh` a novou službu.
 Pro první nasazení dodaného archivu je připravený [docs/DEPLOY.cs.md](docs/DEPLOY.cs.md).
 
+## Restart přes Moonraker
+
+Instalátor doplní `KlipperScreenCam` do `~/printer_data/moonraker.asvc` bez duplicit
+a zachová ostatní služby. Potom ve vhodnou dobu restartuj Moonraker. Přesný postup včetně API: [návod](docs/MOONRAKER.cs.md).
+
 ## Konfigurace
 
 Hlavní soubor je `~/printer_data/config/KlipperScreenCam.conf`, dostupný v editoru
@@ -87,6 +93,7 @@ height = 600
 hide_name_single_camera = true
 
 [stream]
+max_fps = 15
 start_paused = false
 ```
 
@@ -157,10 +164,37 @@ KlipperScreenCam/
 
 Instalace je podporovaná přímo ze zdrojového adresáře; `pip install` není instalační postup aplikace.
 Zdrojové soubory tohoto projektu byly sestaveny podle ověřeného chování z předchozího řešení.
-Verze 0.1.x byla po opravě služby ověřena uživatelem na RPi. Novou jazykovou verzi 0.2.0
-ještě ověř dle
-[docs/TESTING.cs.md](docs/TESTING.cs.md).
+Verze 0.2.3 byla nasazena na RPi; obraz s limitem 15 FPS je podle uživatele plynulý.
+Rozsah kontrol a další scénáře: [docs/TESTING.cs.md](docs/TESTING.cs.md).
 
 Projekt není oficiální součástí KlipperScreenu. Ikony z jeho motivů se čtou z místní instalace,
 nejsou do repozitáře kopírované. Licence tohoto nového projektu zatím nebyla zvolena;
 před veřejným zveřejněním doplň LICENSE a údaje autora. Tento balíček není automaticky publikovaný na GitHub.
+
+## Skutečné vypnutí obrazu
+
+Spojení s kamerou nově vlastní Python. Při vypnutí uzavře skutečný TCP přenos
+a potvrdí zastavení do rozhraní. WebKit načítá jen jednorázový lokální přenos; stará adresa
+po vypnutí nemůže spustit kameru znovu. Nejde jen o skrytí obrazu nebo odstranění img.src.
+Přepnutí kamery uzavře předchozí spojení. Ostatní diváci a Crowsnest nejsou vypínáni.
+Uzavření přenosu bylo ověřeno automatickými testy i přímo na RPi.
+
+## Volitelná GPU akcelerace
+
+V sekci `[display]` nastavit `hardware_acceleration = on`, `auto` nebo `off`.
+Při chybějící volbě zůstává off. Jde o vykreslování WebKitu, nikoliv záruku hardwarového
+dekódování MJPEG. [Postup porovnání a návratu](docs/ACCELERATION.cs.md).
+
+## Omezení místních FPS
+
+V sekci `[stream]` lze nastavit `max_fps = 15` (výchozí 15). Omezuje pouze místní
+vykreslování, původní stream se dál čte. Podrobnosti: [FPS](docs/FPS.cs.md).
+
+Menu nabízí 10, 20, 30 FPS a Neomezeně. Změna platí ihned bez nového spojení
+a nezapne vypnutý obraz. Po restartu služby se obnoví max_fps z konfigurace.
+V konfiguraci lze použít také `max_fps = unlimited`. Vlastní číselná hodnota se
+vloží mezi tlačítka ve vzestupném pořadí bez duplicit. První řádek má tři tlačítka,
+číselná tlačítka mají stejnou šířku a Neomezeně vyplní zbytek druhého řádku.
+Pořadí menu: kamery, červené vypnutí/zapnutí obrazu s ikonou, nadpis Limity snímků,
+naměřené FPS a tlačítka limitů.
+Testovací nasazení: [TEST_0.3.0.cs.md](docs/TEST_0.3.0.cs.md).

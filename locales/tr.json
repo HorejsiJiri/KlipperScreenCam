@@ -18,5 +18,9 @@
   "reconnecting": "Kamera bağlantısı kesildi. Yeniden bağlanılıyor…",
   "camera_unavailable": "Kamera akışı kullanılamıyor. Yeniden denemek için bir kamera seçin.",
   "server_unavailable": "Moonraker kullanılamıyor. Yeniden deneniyor…",
-  "unsupported_stream": "Bu akış türü görüntülenemiyor. HTTP MJPEG akışı gerekli."
+  "unsupported_stream": "Bu akış türü görüntülenemiyor. HTTP MJPEG akışı gerekli.",
+  "fps_limit": "Kare sınırları",
+  "fps_unlimited": "Sınırsız",
+  "fps_source": "Kaynak",
+  "fps_forwarded": "İletilen"
 }

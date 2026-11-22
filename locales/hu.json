@@ -18,5 +18,9 @@
   "reconnecting": "Megszakadt a kapcsolat a kamerával. Újracsatlakozás…",
   "camera_unavailable": "A kamera adatfolyama nem érhető el. Az újrapróbálkozáshoz válassz kamerát.",
   "server_unavailable": "A Moonraker nem érhető el. Újrapróbálkozás…",
-  "unsupported_stream": "Ez az adatfolyamtípus nem jeleníthető meg. HTTP MJPEG adatfolyam szükséges."
+  "unsupported_stream": "Ez az adatfolyamtípus nem jeleníthető meg. HTTP MJPEG adatfolyam szükséges.",
+  "fps_limit": "Képkockakorlátok",
+  "fps_unlimited": "Korlátlan",
+  "fps_source": "Forrás",
+  "fps_forwarded": "Továbbítva"
 }

@@ -18,5 +18,9 @@
   "reconnecting": "انقطع الاتصال بالكاميرا. جارٍ إعادة الاتصال…",
   "camera_unavailable": "بث الكاميرا غير متاح. اختر كاميرا للمحاولة مجددًا.",
   "server_unavailable": "Moonraker غير متاح. جارٍ إعادة المحاولة…",
-  "unsupported_stream": "لا يمكن عرض هذا النوع من البث. يلزم بث HTTP MJPEG."
+  "unsupported_stream": "لا يمكن عرض هذا النوع من البث. يلزم بث HTTP MJPEG.",
+  "fps_limit": "حدود الإطارات",
+  "fps_unlimited": "غير محدود",
+  "fps_source": "المصدر",
+  "fps_forwarded": "المُرسَل"
 }

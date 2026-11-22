@@ -28,6 +28,8 @@ class Settings:
     gear_size: int
     hide_cursor: bool
     hide_name_single: bool
+    hardware_acceleration: str
+    max_fps: int | None
     start_paused: bool
     retry_initial: int
     retry_max: int
@@ -45,9 +47,10 @@ def load(path: Path) -> Settings:
                  "klipperscreen_directory", "klipperscreen_config", "theme",
                  "theme_poll_seconds"},
         "display": {"display", "xauthority", "x", "y", "width", "height",
-                    "menu_min_width", "gear_size", "hide_cursor", "hide_name_single_camera"},
+                    "menu_min_width", "gear_size", "hide_cursor", "hide_name_single_camera",
+                    "hardware_acceleration"},
         "stream": {"reconnect_initial_seconds", "reconnect_max_seconds",
-                   "request_timeout_seconds", "start_paused"},
+                   "request_timeout_seconds", "start_paused", "max_fps"},
     }
     if parser.defaults():
         raise ValueError("[DEFAULT] is not supported")
@@ -86,6 +89,11 @@ def load(path: Path) -> Settings:
         if not re.fullmatch(r"[\w-]+", entry, flags=re.ASCII):
             raise ValueError(f"Invalid {key}: {entry}")
     custom_config = value("main", "klipperscreen_config", "")
+    acceleration = value("display", "hardware_acceleration", "off").lower()
+    if acceleration not in ("off", "auto", "on"):
+        raise ValueError("display.hardware_acceleration must be off, auto or on")
+    fps = value("stream", "max_fps", "15").lower()
+    max_fps = None if fps == "unlimited" else integer("stream", "max_fps", 15, 1, 120)
     initial = integer("stream", "reconnect_initial_seconds", 2, 1, 300)
     maximum = integer("stream", "reconnect_max_seconds", 30, initial, 600)
     return Settings(
@@ -105,6 +113,8 @@ def load(path: Path) -> Settings:
         integer("display", "gear_size", 88, 40, 200),
         parser.getboolean("display", "hide_cursor", fallback=True),
         parser.getboolean("display", "hide_name_single_camera", fallback=True),
+        acceleration,
+        max_fps,
         parser.getboolean("stream", "start_paused", fallback=False),
         initial, maximum,
         integer("stream", "request_timeout_seconds", 5, 1, 60),
