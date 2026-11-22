@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "繁體中文",
+    "code": "zh_TW",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "印表機攝影機",
+  "menu_title": "攝影機",
+  "choose_camera": "選擇攝影機",
+  "close_menu": "關閉選單",
+  "loading": "正在載入攝影機…",
+  "pause_stream": "關閉畫面",
+  "resume_stream": "開啟畫面",
+  "stream_paused": "畫面已關閉",
+  "no_cameras": "沒有可用的已啟用攝影機。",
+  "reconnecting": "攝影機連線已中斷。正在重新連線…",
+  "camera_unavailable": "攝影機串流無法使用。請選擇攝影機重試。",
+  "server_unavailable": "Moonraker 無法使用。正在重試…",
+  "unsupported_stream": "無法顯示此類型的串流。需要 HTTP MJPEG 串流。"
+}

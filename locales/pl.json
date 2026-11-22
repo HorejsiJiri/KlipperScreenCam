@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Polski",
+    "code": "pl",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Kamery drukarki",
+  "menu_title": "Kamery",
+  "choose_camera": "Wybierz kamerę",
+  "close_menu": "Zamknij menu",
+  "loading": "Wczytywanie kamer…",
+  "pause_stream": "Wyłącz obraz",
+  "resume_stream": "Włącz obraz",
+  "stream_paused": "Obraz wyłączony",
+  "no_cameras": "Brak dostępnych włączonych kamer.",
+  "reconnecting": "Utracono połączenie z kamerą. Ponowne łączenie…",
+  "camera_unavailable": "Strumień kamery jest niedostępny. Wybierz kamerę, aby spróbować ponownie.",
+  "server_unavailable": "Moonraker jest niedostępny. Ponowna próba…",
+  "unsupported_stream": "Nie można wyświetlić tego typu strumienia. Wymagany jest strumień HTTP MJPEG."
+}

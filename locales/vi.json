@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Tiếng Việt",
+    "code": "vi",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Camera máy in",
+  "menu_title": "Camera",
+  "choose_camera": "Chọn camera",
+  "close_menu": "Đóng menu",
+  "loading": "Đang tải camera…",
+  "pause_stream": "Tắt hình ảnh",
+  "resume_stream": "Bật hình ảnh",
+  "stream_paused": "Hình ảnh đã tắt",
+  "no_cameras": "Không có camera nào đang bật và khả dụng.",
+  "reconnecting": "Mất kết nối với camera. Đang kết nối lại…",
+  "camera_unavailable": "Luồng camera không khả dụng. Chọn camera để thử lại.",
+  "server_unavailable": "Moonraker không khả dụng. Đang thử lại…",
+  "unsupported_stream": "Không thể hiển thị loại luồng này. Cần có luồng HTTP MJPEG."
+}

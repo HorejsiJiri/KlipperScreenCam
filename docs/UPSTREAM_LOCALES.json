@@ -1,0 +1,137 @@
+{
+  "repository": "KlipperScreen/KlipperScreen",
+  "source_url": "https://github.com/KlipperScreen/KlipperScreen/tree/023f604cb35215098aebe175425de96e05791d96/ks_includes/locales",
+  "commit": "023f604cb35215098aebe175425de96e05791d96",
+  "checked_on": "2026-11-22",
+  "scope": "Locale identifiers only; KlipperScreenCam UI translations are independently prepared, not imported official translations.",
+  "locales": [
+    {
+      "code": "ar",
+      "directory_sha": "1b9784da29a1165dad1afd64fb422aa90eb4eafc"
+    },
+    {
+      "code": "bg",
+      "directory_sha": "5318e478a8600b8babc0a5c17db2243b3394e999"
+    },
+    {
+      "code": "cs",
+      "directory_sha": "45e9036fca8b82ac44142efe849620ac3096ef85"
+    },
+    {
+      "code": "da",
+      "directory_sha": "6866535a3ad1f9d32fc30ce9299649156655cf93"
+    },
+    {
+      "code": "de",
+      "directory_sha": "81a7b75f0f130e3cb4342a9e1024dfd5ea128395"
+    },
+    {
+      "code": "de_formal",
+      "directory_sha": "8e4f17bf32d97db203d702e7f1b49d0e40327f05"
+    },
+    {
+      "code": "en",
+      "directory_sha": "768007dd48bbc3fe7693b8bc2c187326de9d996d"
+    },
+    {
+      "code": "es",
+      "directory_sha": "7e9eef6a468b44d9859cf76fd3e86a85479f8021"
+    },
+    {
+      "code": "et",
+      "directory_sha": "7f45e197ce245718a169df27d47f8ad5b346e7e5"
+    },
+    {
+      "code": "fa",
+      "directory_sha": "66dc4054311b70676814dd6754afbe37891921ed"
+    },
+    {
+      "code": "fr",
+      "directory_sha": "dc8b742bc77929c6713639e7fdcc4e1f262726fd"
+    },
+    {
+      "code": "he",
+      "directory_sha": "637f1f9c8bf7a6eefd3bd25d5bdaa5a0dfc85bb0"
+    },
+    {
+      "code": "hr",
+      "directory_sha": "c0912fd1e9a94ae6c7f40f75a7018efd20f559cd"
+    },
+    {
+      "code": "hu",
+      "directory_sha": "29002fdfd31db93677f103c5c2c361d710a623bc"
+    },
+    {
+      "code": "it",
+      "directory_sha": "0da5e80bf8e060e4d3c22917b52b32ad222c7e16"
+    },
+    {
+      "code": "jp",
+      "directory_sha": "0c6fef04c2a4825adfd49200616bcefef60daa43"
+    },
+    {
+      "code": "ko",
+      "directory_sha": "eb7196a1c970dfa1796add8eea4910ac1bd10363"
+    },
+    {
+      "code": "lt",
+      "directory_sha": "dfb43e78bf7402d80ce3f9a28556e6af54ee86cf"
+    },
+    {
+      "code": "nl",
+      "directory_sha": "ca7b9729d01bcf62b238b70883d88ea1ff9d19c3"
+    },
+    {
+      "code": "pl",
+      "directory_sha": "178753f440083ff8b6bf8d758f62df4b2268e695"
+    },
+    {
+      "code": "pt",
+      "directory_sha": "bf822ad9b10d8f4ee9802aa289efca583c1a3016"
+    },
+    {
+      "code": "pt_BR",
+      "directory_sha": "ad00d670c477694e3d4d01054576a03ee308be3c"
+    },
+    {
+      "code": "rs",
+      "directory_sha": "836e758358f73ba5e24fd8b90fba9eea0b07b844"
+    },
+    {
+      "code": "ru",
+      "directory_sha": "ba52647bff960a07d07c3fa6516df6b2f293a088"
+    },
+    {
+      "code": "sk",
+      "directory_sha": "d3a9ede17b6df8f1dab6264d8c9b5bde4d6848d4"
+    },
+    {
+      "code": "sl",
+      "directory_sha": "983e441c43f64d2663da9c49edd5f8f959495d51"
+    },
+    {
+      "code": "sv",
+      "directory_sha": "db5c42723829c587bca7fa3fe9297c1589a1face"
+    },
+    {
+      "code": "tr",
+      "directory_sha": "eb7c30677f8edd290cbf31dc68429fba3477769f"
+    },
+    {
+      "code": "uk",
+      "directory_sha": "506547be9da51ae4ece90a050f70cc4c259077ce"
+    },
+    {
+      "code": "vi",
+      "directory_sha": "a4a7143526caf6ce89190f3a6fe532bd4dc3967b"
+    },
+    {
+      "code": "zh_CN",
+      "directory_sha": "42893e256056e82ce1dc7414766746fad671a615"
+    },
+    {
+      "code": "zh_TW",
+      "directory_sha": "c4f03e1a055c7023a6a1662b5ec62517cec80518"
+    }
+  ]
+}

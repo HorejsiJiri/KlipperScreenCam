@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "简体中文",
+    "code": "zh_CN",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "打印机摄像头",
+  "menu_title": "摄像头",
+  "choose_camera": "选择摄像头",
+  "close_menu": "关闭菜单",
+  "loading": "正在加载摄像头…",
+  "pause_stream": "关闭画面",
+  "resume_stream": "开启画面",
+  "stream_paused": "画面已关闭",
+  "no_cameras": "没有可用的已启用摄像头。",
+  "reconnecting": "摄像头连接已断开。正在重新连接…",
+  "camera_unavailable": "摄像头视频流不可用。请选择摄像头重试。",
+  "server_unavailable": "Moonraker 不可用。正在重试…",
+  "unsupported_stream": "无法显示此类型的视频流。需要 HTTP MJPEG 视频流。"
+}

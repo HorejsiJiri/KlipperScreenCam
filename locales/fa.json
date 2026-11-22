@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "فارسی",
+    "code": "fa",
+    "direction": "rtl",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "دوربین‌های چاپگر",
+  "menu_title": "دوربین‌ها",
+  "choose_camera": "انتخاب دوربین",
+  "close_menu": "بستن فهرست",
+  "loading": "در حال بارگذاری دوربین‌ها…",
+  "pause_stream": "خاموش کردن تصویر",
+  "resume_stream": "روشن کردن تصویر",
+  "stream_paused": "تصویر خاموش است",
+  "no_cameras": "هیچ دوربین فعال و در دسترسی وجود ندارد.",
+  "reconnecting": "ارتباط با دوربین قطع شد. در حال اتصال مجدد…",
+  "camera_unavailable": "پخش دوربین در دسترس نیست. برای تلاش مجدد یک دوربین انتخاب کنید.",
+  "server_unavailable": "Moonraker در دسترس نیست. تلاش مجدد…",
+  "unsupported_stream": "این نوع پخش قابل نمایش نیست. پخش HTTP MJPEG لازم است."
+}

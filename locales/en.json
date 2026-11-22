@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "name": "English",
+    "code": "en",
+    "translator": ""
+  },
+  "window_title": "Printer cameras",
+  "menu_title": "Cameras",
+  "choose_camera": "Choose a camera",
+  "close_menu": "Close menu",
+  "loading": "Loading cameras…",
+  "pause_stream": "Turn video off",
+  "resume_stream": "Turn video on",
+  "stream_paused": "Video off",
+  "no_cameras": "No enabled cameras are available.",
+  "reconnecting": "Camera connection lost. Reconnecting…",
+  "camera_unavailable": "The camera stream is unavailable. Select a camera to retry.",
+  "server_unavailable": "Moonraker is unavailable. Retrying…",
+  "unsupported_stream": "This stream type cannot be displayed. An HTTP MJPEG stream is required."
+}

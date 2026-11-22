@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Slovenčina",
+    "code": "sk",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Kamery tlačiarne",
+  "menu_title": "Kamery",
+  "choose_camera": "Vybrať kameru",
+  "close_menu": "Zavrieť ponuku",
+  "loading": "Načítavam kamery…",
+  "pause_stream": "Vypnúť obraz",
+  "resume_stream": "Zapnúť obraz",
+  "stream_paused": "Obraz vypnutý",
+  "no_cameras": "Nie sú dostupné žiadne povolené kamery.",
+  "reconnecting": "Spojenie s kamerou bolo prerušené. Obnovujem…",
+  "camera_unavailable": "Obraz kamery nie je dostupný. Vyber kameru a skús to znova.",
+  "server_unavailable": "Moonraker nie je dostupný. Skúšam znova…",
+  "unsupported_stream": "Tento typ streamu sa nedá zobraziť. Je potrebný HTTP MJPEG stream."
+}

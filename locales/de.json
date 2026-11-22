@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Deutsch",
+    "code": "de",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Druckerkameras",
+  "menu_title": "Kameras",
+  "choose_camera": "Kamera auswählen",
+  "close_menu": "Menü schließen",
+  "loading": "Kameras werden geladen…",
+  "pause_stream": "Bild ausschalten",
+  "resume_stream": "Bild einschalten",
+  "stream_paused": "Bild ausgeschaltet",
+  "no_cameras": "Keine aktivierten Kameras verfügbar.",
+  "reconnecting": "Kameraverbindung unterbrochen. Verbindung wird wiederhergestellt…",
+  "camera_unavailable": "Der Kamerastream ist nicht verfügbar. Wähle eine Kamera, um es erneut zu versuchen.",
+  "server_unavailable": "Moonraker ist nicht erreichbar. Neuer Versuch…",
+  "unsupported_stream": "Dieser Streamtyp kann nicht angezeigt werden. Ein HTTP-MJPEG-Stream ist erforderlich."
+}

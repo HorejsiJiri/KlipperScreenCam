@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Lietuvių",
+    "code": "lt",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Spausdintuvo kameros",
+  "menu_title": "Kameros",
+  "choose_camera": "Pasirinkti kamerą",
+  "close_menu": "Užverti meniu",
+  "loading": "Įkeliamos kameros…",
+  "pause_stream": "Išjungti vaizdą",
+  "resume_stream": "Įjungti vaizdą",
+  "stream_paused": "Vaizdas išjungtas",
+  "no_cameras": "Nėra prieinamų įjungtų kamerų.",
+  "reconnecting": "Ryšys su kamera nutrūko. Jungiamasi iš naujo…",
+  "camera_unavailable": "Kameros srautas nepasiekiamas. Pasirinkite kamerą ir bandykite dar kartą.",
+  "server_unavailable": "Moonraker nepasiekiamas. Bandoma dar kartą…",
+  "unsupported_stream": "Šio tipo srauto rodyti negalima. Reikalingas HTTP MJPEG srautas."
+}

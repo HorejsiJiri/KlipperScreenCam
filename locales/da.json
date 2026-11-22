@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Dansk",
+    "code": "da",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Printerkameraer",
+  "menu_title": "Kameraer",
+  "choose_camera": "Vælg kamera",
+  "close_menu": "Luk menu",
+  "loading": "Indlæser kameraer…",
+  "pause_stream": "Slå billedet fra",
+  "resume_stream": "Slå billedet til",
+  "stream_paused": "Billedet er slået fra",
+  "no_cameras": "Ingen aktiverede kameraer er tilgængelige.",
+  "reconnecting": "Forbindelsen til kameraet blev afbrudt. Opretter forbindelse igen…",
+  "camera_unavailable": "Kamerastreamen er ikke tilgængelig. Vælg et kamera for at prøve igen.",
+  "server_unavailable": "Moonraker er ikke tilgængelig. Prøver igen…",
+  "unsupported_stream": "Denne streamtype kan ikke vises. Der kræves en HTTP MJPEG-stream."
+}

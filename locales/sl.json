@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Slovenščina",
+    "code": "sl",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Kamere tiskalnika",
+  "menu_title": "Kamere",
+  "choose_camera": "Izberi kamero",
+  "close_menu": "Zapri meni",
+  "loading": "Nalaganje kamer…",
+  "pause_stream": "Izklopi sliko",
+  "resume_stream": "Vklopi sliko",
+  "stream_paused": "Slika je izklopljena",
+  "no_cameras": "Na voljo ni nobene omogočene kamere.",
+  "reconnecting": "Povezava s kamero je prekinjena. Ponovno povezovanje…",
+  "camera_unavailable": "Tok kamere ni na voljo. Za ponovni poskus izberi kamero.",
+  "server_unavailable": "Moonraker ni na voljo. Ponovni poskus…",
+  "unsupported_stream": "Te vrste toka ni mogoče prikazati. Potreben je tok HTTP MJPEG."
+}

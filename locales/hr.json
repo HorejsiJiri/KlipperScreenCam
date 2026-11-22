@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Hrvatski",
+    "code": "hr",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Kamere pisača",
+  "menu_title": "Kamere",
+  "choose_camera": "Odaberi kameru",
+  "close_menu": "Zatvori izbornik",
+  "loading": "Učitavanje kamera…",
+  "pause_stream": "Isključi sliku",
+  "resume_stream": "Uključi sliku",
+  "stream_paused": "Slika je isključena",
+  "no_cameras": "Nema dostupnih omogućenih kamera.",
+  "reconnecting": "Veza s kamerom je prekinuta. Ponovno povezivanje…",
+  "camera_unavailable": "Prijenos kamere nije dostupan. Odaberi kameru za ponovni pokušaj.",
+  "server_unavailable": "Moonraker nije dostupan. Pokušavam ponovno…",
+  "unsupported_stream": "Ova vrsta prijenosa ne može se prikazati. Potreban je HTTP MJPEG prijenos."
+}

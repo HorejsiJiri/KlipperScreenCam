@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Eesti",
+    "code": "et",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Printeri kaamerad",
+  "menu_title": "Kaamerad",
+  "choose_camera": "Vali kaamera",
+  "close_menu": "Sulge menüü",
+  "loading": "Kaamerate laadimine…",
+  "pause_stream": "Lülita pilt välja",
+  "resume_stream": "Lülita pilt sisse",
+  "stream_paused": "Pilt on välja lülitatud",
+  "no_cameras": "Ühtegi lubatud kaamerat pole saadaval.",
+  "reconnecting": "Ühendus kaameraga katkes. Ühendan uuesti…",
+  "camera_unavailable": "Kaamera voog pole saadaval. Uuesti proovimiseks vali kaamera.",
+  "server_unavailable": "Moonraker pole saadaval. Proovin uuesti…",
+  "unsupported_stream": "Seda vootüüpi ei saa kuvada. Vajalik on HTTP MJPEG voog."
+}

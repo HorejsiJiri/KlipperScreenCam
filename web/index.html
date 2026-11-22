@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KlipperScreenCam</title>
+<style>
+:root {
+  /* Neutral boot fallback, replaced by GTK-computed theme colors. */
+  --bg:#15191c; --text:white; --active:#34495e; --lines:#ccc;
+  --color1:#ccc; --color2:#ccc; --color3:#ccc; --color4:#ccc;
+  --gear-size:88px;
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; width:100%; height:100%; overflow:hidden;
+  background:black; color:var(--text); font-family:sans-serif; user-select:none; }
+body.hide-cursor,body.hide-cursor * { cursor:none !important; }
+#video { position:absolute; top:50%; left:50%; object-fit:contain; }
+#title { position:absolute; top:16px; left:18px; max-width:calc(100% - var(--gear-size) - 40px);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:26px; font-weight:bold; background:transparent;
+  text-shadow:0 1px 3px black,0 0 5px black; pointer-events:none; }
+#gear { position:absolute; top:4px; right:4px; width:var(--gear-size); height:var(--gear-size);
+  padding:6px; border:0; background:transparent; }
+#gear img { width:100%; height:100%; filter:drop-shadow(0 1px 3px black); }
+#dismiss { position:absolute; inset:0; background:transparent; }
+#menu { position:absolute; top:0; right:0; width:410px; max-width:100%; max-height:100%;
+  overflow-y:auto; overflow-x:hidden; padding:12px; background:var(--bg);
+  color:var(--text); border:2px solid var(--lines); border-radius:0 0 0 12px;
+  box-shadow:0 4px 14px #0008; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
+#menu::-webkit-scrollbar { width:16px; }
+#menu::-webkit-scrollbar-track { background:var(--bg); }
+#menu::-webkit-scrollbar-thumb { background:var(--lines); border:4px solid var(--bg); border-radius:10px; }
+#heading { display:flex; align-items:center; justify-content:space-between;
+  min-height:48px; margin-bottom:8px; font-size:24px; font-weight:bold; }
+#close { width:52px; height:48px; padding:0; font-size:36px;
+  background:transparent; border:0; color:var(--text); }
+.camera { display:flex; align-items:center; gap:16px; width:100%; min-height:74px;
+  margin:0 0 8px; padding:10px 14px; text-align:left; font:24px sans-serif;
+  color:var(--text); background:var(--normal,var(--bg)); border:1px solid var(--lines);
+  border-bottom:4px solid var(--accent); border-radius:8px; }
+.camera:last-child { margin-bottom:0; }
+.camera.selected,.camera:active { background:var(--active); }
+.camera img { width:42px; height:42px; flex:0 0 42px; }
+.camera span { flex:1; min-width:0; overflow-wrap:anywhere; white-space:normal; text-align:left; }
+#menu[dir="rtl"] .camera, #menu[dir="rtl"] .camera span { text-align:right; }
+#message { font-size:20px; padding:12px 0; overflow-wrap:anywhere; }
+#stream-toggle { width:100%; min-height:62px; margin:12px 0 0; padding:10px;
+  font:22px sans-serif; color:var(--text); background:var(--bg);
+  border:2px solid var(--lines); border-radius:8px; }
+#paused { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  display:flex; flex-direction:column; align-items:center; gap:20px;
+  text-align:center; font-size:30px; font-weight:bold; color:var(--text); pointer-events:none; }
+#pause-icon { position:relative; width:128px; height:128px; }
+#pause-icon img { width:100%; height:100%; opacity:.7; }
+#pause-icon svg { position:absolute; inset:0; width:100%; height:100%; }
+#pause-icon line { stroke:var(--text); stroke-width:8; stroke-linecap:round; }
+[hidden] { display:none !important; }
+</style>
+<img id="video" alt="">
+<div id="paused" hidden>
+  <div id="pause-icon"><img alt=""><svg viewBox="0 0 128 128" aria-hidden="true"><line x1="14" y1="114" x2="114" y2="14"/></svg></div>
+  <span id="pause-label"></span>
+</div>
+<div id="title" dir="auto">KlipperScreenCam</div>
+<button id="gear" aria-label="Cameras"><img alt=""></button>
+<div id="dismiss" hidden></div>
+<section id="menu" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
+  <div id="heading"><span id="menu-title"></span><button id="close">×</button></div>
+  <div id="list"></div><button id="stream-toggle"></button><div id="message" hidden></div>
+</section>
+<script>
+"use strict";
+(() => {
+  const $=selector=>document.querySelector(selector);
+  const video=$("#video"),title=$("#title"),gear=$("#gear"),menu=$("#menu");
+  let cameras=[],selected=null,cameraIcon="",retryTimer=null,errorKey="",paused=false;
+  let texts={},options={menuWidth:410,gearSize:88,hideCursor:true,hideNameSingle:true,startPaused:false,retryInitial:2,retryMax:30};
+  let retryDelay=options.retryInitial;
+  const t=key=>texts[key]||key;
+  const current=()=>cameras.find(camera=>camera.uid===selected);
+  const singleCamera=()=>options.hideNameSingle && cameras.length===1;
+
+  function showMenu(open) {
+    menu.hidden=!open;
+    $("#dismiss").hidden=!open;
+    gear.hidden=open;
+    title.hidden=singleCamera();
+    if(open) sizeMenu();
+  }
+  function setError(key) {
+    errorKey=key;
+    $("#message").textContent=key?t(key):"";
+    $("#message").hidden=!key;
+    if(!selected) title.textContent=t(key||"loading");
+  }
+  function sizeMenu() {
+    const buttons=[...$("#list").children];
+    if(!buttons.length) return;
+    const context=document.createElement("canvas").getContext("2d");
+    context.font=getComputedStyle(buttons[0]).font||"24px sans-serif";
+    let longest=0;
+    buttons.forEach(button=>{
+      button.style.height="";
+      longest=Math.max(longest,context.measureText(button.querySelector("span").textContent).width);
+    });
+    menu.style.width=Math.min(innerWidth,Math.max(options.menuWidth,Math.ceil(longest+142)))+"px";
+    const height=Math.ceil(Math.max(74,...buttons.map(button=>button.getBoundingClientRect().height)));
+    buttons.forEach(button=>button.style.height=height+"px");
+  }
+  function sizeVideo() {
+    const camera=current();
+    const angle=camera?camera.rotation:0;
+    const swap=(angle%180)!==0;
+    video.style.width=(swap?innerHeight:innerWidth)+"px";
+    video.style.height=(swap?innerWidth:innerHeight)+"px";
+    video.style.transform=`translate(-50%,-50%) rotate(${angle}deg) scale(${camera?.flip_horizontal?-1:1},${camera?.flip_vertical?-1:1})`;
+  }
+  function drawList() {
+    $("#list").replaceChildren();
+    cameras.forEach((camera,index)=>{
+      const button=document.createElement("button");
+      button.className="camera"+(camera.uid===selected?" selected":"");
+      button.setAttribute("aria-pressed",String(camera.uid===selected));
+      button.style.setProperty("--accent",`var(--color${index%4+1})`);
+      button.style.setProperty("--normal",`var(--button${index%4+1},var(--bg))`);
+      const icon=document.createElement("img");
+      icon.alt="";
+      if(cameraIcon) icon.src=cameraIcon;
+      const name=document.createElement("span");
+      name.textContent=camera.name;
+      button.append(icon,name);
+      button.onclick=()=>choose(camera.uid);
+      $("#list").append(button);
+    });
+    if(!menu.hidden) sizeMenu();
+  }
+  function startStream() {
+    clearTimeout(retryTimer);
+    const camera=current();
+    video.removeAttribute("src");
+    updatePauseControls();
+    if(paused) return;
+    if(!camera) return;
+    if(!camera.supported) { setError("unsupported_stream"); return; }
+    setError("");
+    sizeVideo();
+    const url=new URL(camera.url,document.baseURI);
+    url.searchParams.set("_ksc_retry",Date.now().toString());
+    video.src=url.href;
+  }
+  function choose(uid,resume=true) {
+    if(!cameras.some(camera=>camera.uid===uid)) return;
+    selected=uid;
+    if(resume) paused=false;
+    retryDelay=options.retryInitial;
+    title.textContent=current().name;
+    startStream(); // Selecting the same camera also forces a reconnect.
+    drawList();
+    showMenu(false);
+    window.webkit?.messageHandlers?.ksc?.postMessage(JSON.stringify({action:"selected",uid}));
+  }
+  function updatePauseControls() {
+    $("#stream-toggle").textContent=t(paused?"resume_stream":"pause_stream");
+    $("#pause-label").textContent=t("stream_paused");
+    $("#paused").hidden=!paused;
+    $("#stream-toggle").disabled=!selected;
+  }
+  $("#stream-toggle").onclick=()=>{
+    if(!selected) return;
+    paused=!paused;
+    retryDelay=options.retryInitial;
+    startStream();
+    showMenu(false);
+  };
+  gear.onclick=()=>showMenu(true);
+  $("#dismiss").onclick=()=>showMenu(false);
+  $("#close").onclick=()=>showMenu(false);
+  document.addEventListener("keydown",event=>{ if(event.key==="Escape") showMenu(false); });
+  window.addEventListener("resize",()=>{ sizeVideo(); if(!menu.hidden) sizeMenu(); });
+  video.onerror=()=>{
+    if(paused || !current()?.supported) return;
+    setError("reconnecting");
+    clearTimeout(retryTimer);
+    const uid=selected;
+    retryTimer=setTimeout(()=>{ if(!paused && selected===uid) startStream(); },retryDelay*1000);
+    retryDelay=Math.min(options.retryMax,retryDelay*2);
+  };
+  video.onload=()=>{ retryDelay=options.retryInitial; setError(""); };
+
+  window.KSC={
+    configure(data) {
+      options={...options,...data};
+      paused=options.startPaused;
+      retryDelay=options.retryInitial;
+      document.body.classList.toggle("hide-cursor",options.hideCursor);
+      document.documentElement.style.setProperty("--gear-size",options.gearSize+"px");
+      sizeVideo();
+      showMenu(!menu.hidden);
+    },
+    setCameras(data) {
+      cameras=data.cameras;
+      if(cameras.length) choose(data.preferred||cameras[0].uid,false);
+      else { selected=null; video.removeAttribute("src"); drawList(); showMenu(false); setError("no_cameras"); }
+    },
+    setAppearance(data) {
+      if(data.messages) texts=data.messages;
+      if(data.language) document.documentElement.lang=data.language;
+      menu.dir=texts._meta?.direction||"ltr";
+      if(data.colors) Object.entries(data.colors).forEach(([name,value])=>{
+        document.documentElement.style.setProperty("--"+name,value);
+      });
+      if(data.icons) {
+        gear.querySelector("img").src=data.icons.settings;
+        cameraIcon=data.icons.camera;
+        $("#pause-icon img").src=data.icons.camera;
+      }
+      $("#menu-title").textContent=t("menu_title");
+      gear.setAttribute("aria-label",t("choose_camera"));
+      $("#close").setAttribute("aria-label",t("close_menu"));
+      setError(errorKey);
+      updatePauseControls();
+      drawList();
+    },
+    error:setError,
+  };
+})();
+</script>
+</html>

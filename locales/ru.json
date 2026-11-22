@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Русский",
+    "code": "ru",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Камеры принтера",
+  "menu_title": "Камеры",
+  "choose_camera": "Выбрать камеру",
+  "close_menu": "Закрыть меню",
+  "loading": "Загрузка камер…",
+  "pause_stream": "Выключить изображение",
+  "resume_stream": "Включить изображение",
+  "stream_paused": "Изображение выключено",
+  "no_cameras": "Нет доступных включённых камер.",
+  "reconnecting": "Соединение с камерой потеряно. Повторное подключение…",
+  "camera_unavailable": "Поток камеры недоступен. Выберите камеру для повторной попытки.",
+  "server_unavailable": "Moonraker недоступен. Повторная попытка…",
+  "unsupported_stream": "Этот тип потока нельзя отобразить. Требуется поток HTTP MJPEG."
+}

@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Türkçe",
+    "code": "tr",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Yazıcı kameraları",
+  "menu_title": "Kameralar",
+  "choose_camera": "Kamera seç",
+  "close_menu": "Menüyü kapat",
+  "loading": "Kameralar yükleniyor…",
+  "pause_stream": "Görüntüyü kapat",
+  "resume_stream": "Görüntüyü aç",
+  "stream_paused": "Görüntü kapalı",
+  "no_cameras": "Kullanılabilir etkin kamera yok.",
+  "reconnecting": "Kamera bağlantısı kesildi. Yeniden bağlanılıyor…",
+  "camera_unavailable": "Kamera akışı kullanılamıyor. Yeniden denemek için bir kamera seçin.",
+  "server_unavailable": "Moonraker kullanılamıyor. Yeniden deneniyor…",
+  "unsupported_stream": "Bu akış türü görüntülenemiyor. HTTP MJPEG akışı gerekli."
+}

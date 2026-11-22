@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "日本語",
+    "code": "jp",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "プリンターのカメラ",
+  "menu_title": "カメラ",
+  "choose_camera": "カメラを選択",
+  "close_menu": "メニューを閉じる",
+  "loading": "カメラを読み込み中…",
+  "pause_stream": "映像をオフにする",
+  "resume_stream": "映像をオンにする",
+  "stream_paused": "映像はオフです",
+  "no_cameras": "利用可能な有効カメラがありません。",
+  "reconnecting": "カメラとの接続が切れました。再接続中…",
+  "camera_unavailable": "カメラの映像を取得できません。カメラを選択して再試行してください。",
+  "server_unavailable": "Moonrakerに接続できません。再試行中…",
+  "unsupported_stream": "この形式の映像は表示できません。HTTP MJPEGストリームが必要です。"
+}

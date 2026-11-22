@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Español",
+    "code": "es",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Cámaras de la impresora",
+  "menu_title": "Cámaras",
+  "choose_camera": "Elegir cámara",
+  "close_menu": "Cerrar menú",
+  "loading": "Cargando cámaras…",
+  "pause_stream": "Desactivar imagen",
+  "resume_stream": "Activar imagen",
+  "stream_paused": "Imagen desactivada",
+  "no_cameras": "No hay cámaras habilitadas disponibles.",
+  "reconnecting": "Se perdió la conexión con la cámara. Reconectando…",
+  "camera_unavailable": "La transmisión de la cámara no está disponible. Selecciona una cámara para reintentar.",
+  "server_unavailable": "Moonraker no está disponible. Reintentando…",
+  "unsupported_stream": "No se puede mostrar este tipo de transmisión. Se requiere una transmisión HTTP MJPEG."
+}

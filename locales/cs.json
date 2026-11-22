@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "name": "Čeština",
+    "code": "cs",
+    "translator": ""
+  },
+  "window_title": "Kamery tiskárny",
+  "menu_title": "Kamery",
+  "choose_camera": "Vybrat kameru",
+  "close_menu": "Zavřít nabídku",
+  "loading": "Načítám kamery…",
+  "pause_stream": "Vypnout obraz",
+  "resume_stream": "Zapnout obraz",
+  "stream_paused": "Obraz vypnut",
+  "no_cameras": "Nejsou dostupné žádné povolené kamery.",
+  "reconnecting": "Spojení s kamerou přerušeno. Obnovuji…",
+  "camera_unavailable": "Obraz kamery není dostupný. Vyber kameru pro nový pokus.",
+  "server_unavailable": "Moonraker není dostupný. Zkouším znovu…",
+  "unsupported_stream": "Tento typ streamu nelze zobrazit. Je potřeba HTTP MJPEG stream."
+}

@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Français",
+    "code": "fr",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Caméras de l’imprimante",
+  "menu_title": "Caméras",
+  "choose_camera": "Choisir une caméra",
+  "close_menu": "Fermer le menu",
+  "loading": "Chargement des caméras…",
+  "pause_stream": "Désactiver l’image",
+  "resume_stream": "Activer l’image",
+  "stream_paused": "Image désactivée",
+  "no_cameras": "Aucune caméra activée n’est disponible.",
+  "reconnecting": "Connexion à la caméra perdue. Reconnexion…",
+  "camera_unavailable": "Le flux de la caméra est indisponible. Sélectionnez une caméra pour réessayer.",
+  "server_unavailable": "Moonraker est indisponible. Nouvelle tentative…",
+  "unsupported_stream": "Ce type de flux ne peut pas être affiché. Un flux HTTP MJPEG est nécessaire."
+}

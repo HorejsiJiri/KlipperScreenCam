@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Български",
+    "code": "bg",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Камери на принтера",
+  "menu_title": "Камери",
+  "choose_camera": "Избор на камера",
+  "close_menu": "Затваряне на менюто",
+  "loading": "Зареждане на камерите…",
+  "pause_stream": "Изключване на картината",
+  "resume_stream": "Включване на картината",
+  "stream_paused": "Картината е изключена",
+  "no_cameras": "Няма налични активирани камери.",
+  "reconnecting": "Връзката с камерата е прекъсната. Повторно свързване…",
+  "camera_unavailable": "Потокът от камерата не е наличен. Изберете камера за нов опит.",
+  "server_unavailable": "Moonraker не е достъпен. Нов опит…",
+  "unsupported_stream": "Този тип поток не може да се показва. Необходим е HTTP MJPEG поток."
+}

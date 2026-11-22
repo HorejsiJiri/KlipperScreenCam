@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Svenska",
+    "code": "sv",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Skrivarkameror",
+  "menu_title": "Kameror",
+  "choose_camera": "Välj kamera",
+  "close_menu": "Stäng menyn",
+  "loading": "Läser in kameror…",
+  "pause_stream": "Stäng av bilden",
+  "resume_stream": "Slå på bilden",
+  "stream_paused": "Bilden är avstängd",
+  "no_cameras": "Inga aktiverade kameror är tillgängliga.",
+  "reconnecting": "Anslutningen till kameran bröts. Ansluter igen…",
+  "camera_unavailable": "Kameraströmmen är inte tillgänglig. Välj en kamera för att försöka igen.",
+  "server_unavailable": "Moonraker är inte tillgänglig. Försöker igen…",
+  "unsupported_stream": "Den här strömtypen kan inte visas. En HTTP MJPEG-ström krävs."
+}

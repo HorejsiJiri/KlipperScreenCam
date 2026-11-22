@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Italiano",
+    "code": "it",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Telecamere della stampante",
+  "menu_title": "Telecamere",
+  "choose_camera": "Scegli telecamera",
+  "close_menu": "Chiudi menu",
+  "loading": "Caricamento delle telecamere…",
+  "pause_stream": "Disattiva immagine",
+  "resume_stream": "Attiva immagine",
+  "stream_paused": "Immagine disattivata",
+  "no_cameras": "Nessuna telecamera abilitata disponibile.",
+  "reconnecting": "Connessione alla telecamera interrotta. Riconnessione…",
+  "camera_unavailable": "Il flusso della telecamera non è disponibile. Seleziona una telecamera per riprovare.",
+  "server_unavailable": "Moonraker non è disponibile. Nuovo tentativo…",
+  "unsupported_stream": "Questo tipo di flusso non può essere visualizzato. È necessario un flusso HTTP MJPEG."
+}

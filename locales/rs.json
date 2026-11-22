@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Српски",
+    "code": "rs",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Камере штампача",
+  "menu_title": "Камере",
+  "choose_camera": "Изабери камеру",
+  "close_menu": "Затвори мени",
+  "loading": "Учитавање камера…",
+  "pause_stream": "Искључи слику",
+  "resume_stream": "Укључи слику",
+  "stream_paused": "Слика је искључена",
+  "no_cameras": "Нема доступних омогућених камера.",
+  "reconnecting": "Веза са камером је прекинута. Поновно повезивање…",
+  "camera_unavailable": "Стрим камере није доступан. Изабери камеру за нови покушај.",
+  "server_unavailable": "Moonraker није доступан. Покушавам поново…",
+  "unsupported_stream": "Овај тип стрима не може да се прикаже. Потребан је HTTP MJPEG стрим."
+}

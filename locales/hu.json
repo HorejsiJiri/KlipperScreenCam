@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "Magyar",
+    "code": "hu",
+    "direction": "ltr",
+    "translator": "AI-assisted draft; native review welcome",
+    "review_status": "needs-native-review"
+  },
+  "window_title": "Nyomtatókamerák",
+  "menu_title": "Kamerák",
+  "choose_camera": "Kamera kiválasztása",
+  "close_menu": "Menü bezárása",
+  "loading": "Kamerák betöltése…",
+  "pause_stream": "Kép kikapcsolása",
+  "resume_stream": "Kép bekapcsolása",
+  "stream_paused": "Kép kikapcsolva",
+  "no_cameras": "Nincs elérhető engedélyezett kamera.",
+  "reconnecting": "Megszakadt a kapcsolat a kamerával. Újracsatlakozás…",
+  "camera_unavailable": "A kamera adatfolyama nem érhető el. Az újrapróbálkozáshoz válassz kamerát.",
+  "server_unavailable": "A Moonraker nem érhető el. Újrapróbálkozás…",
+  "unsupported_stream": "Ez az adatfolyamtípus nem jeleníthető meg. HTTP MJPEG adatfolyam szükséges."
+}
