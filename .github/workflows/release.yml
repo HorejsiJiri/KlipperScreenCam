@@ -1,0 +1,55 @@
+name: Publish release
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate package inputs
+        run: |
+          python -m unittest discover -s tests -v
+          python launcher.py --check-locales
+          python launcher.py --config config/KlipperScreenCam.conf --check
+      - name: Build release archives and checksums
+        run: python scripts/package.py --output dist
+      - name: Wait for Checks and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(python launcher.py --version)"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          tag="v$version"
+          for attempt in $(seq 1 60); do
+            status="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow checks.yml --commit "$GITHUB_SHA" --limit 1 --json status --jq '.[0].status // "missing"')"
+            if [[ "$status" == "completed" ]]; then
+              conclusion="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow checks.yml --commit "$GITHUB_SHA" --limit 1 --json conclusion --jq '.[0].conclusion')"
+              [[ "$conclusion" == "success" ]] || { echo "Checks did not pass"; exit 1; }
+              break
+            fi
+            [[ "$attempt" != 60 ]] || { echo "Timed out waiting for Checks"; exit 1; }
+            sleep 5
+          done
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release already exists; refusing to overwrite it"
+            exit 1
+          fi
+          gh release create "$tag" \
+            "dist/KlipperScreenCam-$version.zip" \
+            "dist/KlipperScreenCam-$version.tar.gz" \
+            "dist/KlipperScreenCam-$version-SHA256SUMS.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "KlipperScreenCam $version" --notes-file CHANGELOG.md
+          echo "Published $tag" >> "$GITHUB_STEP_SUMMARY"
