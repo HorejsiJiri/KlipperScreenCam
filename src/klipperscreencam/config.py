@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
 import os
+import logging
 import re
 
 
@@ -30,6 +31,8 @@ class Settings:
     hide_name_single: bool
     hardware_acceleration: str
     max_fps: int | None
+    dpms_poll_seconds: int
+    pause_on_dpms: bool
     start_paused: bool
     retry_initial: int
     retry_max: int
@@ -48,9 +51,9 @@ def load(path: Path) -> Settings:
                  "theme_poll_seconds"},
         "display": {"display", "xauthority", "x", "y", "width", "height",
                     "menu_min_width", "gear_size", "hide_cursor", "hide_name_single_camera",
-                    "hardware_acceleration"},
+                    "hardware_acceleration", "pause_on_dpms", "dpms_poll_seconds"},
         "stream": {"reconnect_initial_seconds", "reconnect_max_seconds",
-                   "request_timeout_seconds", "start_paused", "max_fps"},
+                   "request_timeout_seconds", "start_paused", "max_fps", "pause_on_dpms", "dpms_poll_seconds"},
     }
     if parser.defaults():
         raise ValueError("[DEFAULT] is not supported")
@@ -69,6 +72,14 @@ def load(path: Path) -> Settings:
         if not low <= result <= high:
             raise ValueError(f"{section}.{key} must be between {low} and {high}")
         return result
+
+    def display_option_section(key):
+        if parser.has_option("display", key) and parser.has_option("stream", key):
+            raise ValueError(f"{key} is defined in both [display] and [stream]; keep it only in [display]")
+        if parser.has_option("stream", key):
+            logging.getLogger(__name__).warning("Move %s from [stream] to [display]", key)
+            return "stream"
+        return "display"
 
     def filesystem(raw):
         result = Path(os.path.expanduser(raw))
@@ -115,6 +126,8 @@ def load(path: Path) -> Settings:
         parser.getboolean("display", "hide_name_single_camera", fallback=True),
         acceleration,
         max_fps,
+        integer(display_option_section("dpms_poll_seconds"), "dpms_poll_seconds", 20, 1, 120),
+        parser.getboolean(display_option_section("pause_on_dpms"), "pause_on_dpms", fallback=True),
         parser.getboolean("stream", "start_paused", fallback=False),
         initial, maximum,
         integer("stream", "request_timeout_seconds", 5, 1, 60),

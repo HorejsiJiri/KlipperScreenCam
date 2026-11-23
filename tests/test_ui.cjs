@@ -194,6 +194,38 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
     },{cameras:[camera(1)],preferred:"1"});
     assert.equal(await page.locator("#video").getAttribute("src"),null);
     assert.equal(await page.locator("#paused").isVisible(),true);
+    // DPMS sleep is separate from manual pause and must invalidate late replies.
+    await page.evaluate(data=>{
+      KSC.configure({startPaused:false,displaySleeping:false,maxFps:20,configuredMaxFps:15});
+      KSC.setCameras(data);
+    },{cameras:[camera(1),camera(2)],preferred:"2"});
+    assert.ok(await page.locator("#video").getAttribute("src"));
+    const preSleep=await page.evaluate(()=>events.filter(e=>e.action==="stream").at(-1));
+    await page.evaluate(()=>KSC.setDisplayPower({sleeping:true}));
+    assert.equal(await page.locator("#video").getAttribute("src"),null);
+    await page.evaluate(generation=>KSC.streamReady({generation,url:"http://camera.test/stale"}),preSleep.generation);
+    assert.equal(await page.locator("#video").getAttribute("src"),null);
+    const sleepingCount=await page.evaluate(()=>events.filter(e=>e.action==="stream").length);
+    await page.evaluate(()=>document.querySelector("#video").dispatchEvent(new Event("error")));
+    await page.waitForTimeout(30);
+    assert.equal(await page.evaluate(()=>events.filter(e=>e.action==="stream").length),sleepingCount);
+    await page.evaluate(()=>KSC.setDisplayPower({sleeping:false}));
+    assert.ok((await page.locator("#video").getAttribute("src")).includes("stream2"));
+    await page.locator("#gear").click();
+    assert.equal(await page.locator('[data-fps="20"]').getAttribute("aria-pressed"),"true");
+    await page.locator("#stream-toggle").click();
+    assert.equal(await page.locator("#paused").isVisible(),true);
+    await page.evaluate(()=>{KSC.setDisplayPower({sleeping:true});KSC.setDisplayPower({sleeping:false});});
+    assert.equal(await page.locator("#video").getAttribute("src"),null);
+    assert.equal(await page.locator("#paused").isVisible(),true);
+    // Starting the renderer while asleep must not connect until actual wake-up.
+    await page.evaluate(data=>{
+      KSC.configure({startPaused:false,displaySleeping:true});
+      KSC.setCameras(data);
+    },{cameras:[camera(1)],preferred:"1"});
+    assert.equal(await page.locator("#video").getAttribute("src"),null);
+    await page.evaluate(()=>KSC.setDisplayPower({sleeping:false}));
+    assert.ok(await page.locator("#video").getAttribute("src"));
     if(process.env.KSC_UI_SCREENSHOT) {
       await page.evaluate(({messages,cameras})=>{
         KSC.configure({startPaused:false,maxFps:15,configuredMaxFps:15});
@@ -205,7 +237,7 @@ const camera=(index,name="Camera "+index)=>({uid:String(index),name,
       await page.locator("#menu").screenshot({path:process.env.KSC_UI_SCREENSHOT});
     }
     assert.deepEqual(errors,[]);
-    console.log("UI checks passed: live FPS/unlimited, paused FPS changes, selection, reconnect, pause/resume, single camera, scrolling, long labels, theme, escaped names, all locales and RTL.");
+    console.log("UI checks passed: DPMS sleep/wake and manual pause, live FPS/unlimited, paused FPS changes, selection, reconnect, pause/resume, single camera, scrolling, long labels, theme, escaped names, all locales and RTL.");
   } finally {
     await browser.close();
   }

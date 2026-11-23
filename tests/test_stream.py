@@ -108,6 +108,23 @@ class StreamTests(unittest.TestCase):
         time.sleep(0.1)
         self.assertEqual(self.source.sent, sent_after_close, "Frames still flowing while off")
 
+    def test_display_sleep_closes_real_camera_connection(self):
+        from klipperscreencam.power import DisplayPower
+        url = self.proxy.prepare(self.source.url + "/stream")
+        self.open_stream(url)
+        events = []
+        power = DisplayPower(self.proxy.stop, events.append)
+        power.update(False)
+        self.assertTrue(self.source.closed.wait(2))
+        sent = self.source.sent
+        time.sleep(0.1)
+        self.assertEqual(self.source.sent, sent)
+        self.assertEqual(events, [True])
+        self.assertIsNone(self.proxy.current)
+        power.update(True)
+        self.assertIsNone(self.proxy.current)  # Wake lets the UI decide manual pause.
+        self.assertEqual(events, [True, False])
+
     def test_stale_browser_retry_cannot_restart_stopped_stream(self):
         url = self.proxy.prepare(self.source.url + "/stream")
         self.open_stream(url)

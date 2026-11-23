@@ -90,7 +90,7 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
 (() => {
   const $=selector=>document.querySelector(selector);
   const video=$("#video"),title=$("#title"),gear=$("#gear"),menu=$("#menu");
-  let cameras=[],selected=null,cameraIcon="",retryTimer=null,errorKey="",paused=false;
+  let cameras=[],selected=null,cameraIcon="",retryTimer=null,errorKey="",paused=false,sleeping=false;
   let streamGeneration=0,stopAcknowledged=false,maxFps=15;
   let streamStats={sourceFps:0,forwardedFps:0},configuredMaxFps=15,fpsChoicesKey="";
   let texts={},options={menuWidth:410,gearSize:88,hideCursor:true,hideNameSingle:true,startPaused:false,retryInitial:2,retryMax:30};
@@ -160,7 +160,7 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
     stopAcknowledged=false;
     video.removeAttribute("src");
     updatePauseControls();
-    const active=!paused && !!camera?.supported;
+    const active=!paused && !sleeping && !!camera?.supported;
     if(!paused && camera && !camera.supported) setError("unsupported_stream");
     else setError("");
     sizeVideo();
@@ -225,11 +225,11 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
   document.addEventListener("keydown",event=>{ if(event.key==="Escape") showMenu(false); });
   window.addEventListener("resize",()=>{ sizeVideo(); if(!menu.hidden) sizeMenu(); });
   video.onerror=()=>{
-    if(paused || !current()?.supported) return;
+    if(paused || sleeping || !current()?.supported) return;
     setError("reconnecting");
     clearTimeout(retryTimer);
     const uid=selected;
-    retryTimer=setTimeout(()=>{ if(!paused && selected===uid) startStream(); },retryDelay*1000);
+    retryTimer=setTimeout(()=>{ if(!paused && !sleeping && selected===uid) startStream(); },retryDelay*1000);
     retryDelay=Math.min(options.retryMax,retryDelay*2);
   };
   video.onload=()=>{ retryDelay=options.retryInitial; setError(""); };
@@ -238,6 +238,7 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
     configure(data) {
       options={...options,...data};
       paused=options.startPaused;
+      if(Object.hasOwn(data,"displaySleeping")) sleeping=data.displaySleeping;
       if(Object.hasOwn(data,"maxFps")) maxFps=data.maxFps;
       if(Object.hasOwn(data,"configuredMaxFps")) configuredMaxFps=data.configuredMaxFps;
       updateFpsControls();
@@ -246,6 +247,11 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
       document.documentElement.style.setProperty("--gear-size",options.gearSize+"px");
       sizeVideo();
       showMenu(!menu.hidden);
+    },
+    setDisplayPower(data) {
+      if(sleeping===data.sleeping) return;
+      sleeping=data.sleeping;
+      startStream();
     },
     setStreamStats(data) {
       streamStats=data;
@@ -262,7 +268,7 @@ body.hide-cursor,body.hide-cursor * { cursor:none !important; }
       else { selected=null; startStream(); drawList(); showMenu(false); setError("no_cameras"); }
     },
     streamReady(data) {
-      if(data.generation!==streamGeneration || paused) return;
+      if(data.generation!==streamGeneration || paused || sleeping) return;
       video.src=data.url;
     },
     streamStopped(data) {

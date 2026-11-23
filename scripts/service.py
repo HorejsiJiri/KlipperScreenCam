@@ -100,6 +100,8 @@ def main():
                         help="Moonraker data directory; defaults to parent of --config-dir")
     parser.add_argument("--skip-moonraker-registration", action="store_true",
                         help="Do not modify the Moonraker service allowlist")
+    parser.add_argument("--shared-wake", action="store_true",
+                        help="Apply the verified KlipperScreen shared-wake fix with backup")
     args = parser.parse_args()
     if sys.platform != "linux":
         raise RuntimeError("The installer supports Linux with apt/systemd only")
@@ -141,6 +143,11 @@ def main():
     else:
         print("Keeping existing configuration:", config)
     run("/usr/bin/python3", ROOT / "launcher.py", "--config", config, "--check")
+    if args.shared_wake:
+        sys.path.insert(0, str(ROOT / "src"))
+        from klipperscreencam.config import load
+        run("/usr/bin/python3", ROOT / "scripts/shared_wake.py",
+            "--directory", load(config).ks_directory, "--apply")
     if UNIT.exists():
         backup = UNIT.with_suffix(".service.ksc-backup")
         run("sudo", "cp", "-p", "--", UNIT, backup)

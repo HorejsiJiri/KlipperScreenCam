@@ -1,4 +1,6 @@
-# Místní omezení snímků od verze 0.2.3
+# Limit snímků a údaje FPS
+
+[English](FPS.md) · [Česky](FPS.cs.md)
 
 Do existující sekce `[stream]` v `~/printer_data/config/KlipperScreenCam.conf` doplň:
 
@@ -8,7 +10,7 @@ max_fps = 15
 ```
 
 Nevytvářej druhou sekci `[stream]`, pokud už existuje. Výchozí limit při vynechání
-volby je 15 FPS. Povolené jsou celé hodnoty 1 až 120. Limit nezvýší FPS nad možnosti zdroje.
+volby je 15 FPS. Povolené jsou celé hodnoty 1 až 120 nebo unlimited. Limit nezvýší FPS nad možnosti zdroje.
 Po změně ověř konfiguraci a restartuj pouze kamerový náhled:
 
 ```bash
@@ -34,15 +36,15 @@ Při vypnutí obrazu se jako dosud skutečně uzavírá místní kamerové spoje
 
 Testováno místně s nepřetržitým MJPEG HTTP serverem: omezení toku snímků, zachování
 JPEG dat, fragmentované hranice, stream bez Content-Length a pokračování druhého
-nezávislého klienta po vypnutí místního obrazu. Na cílovém RPi uživatel potvrdil plynulý obraz s limitem 15 FPS. Paměť parseru je omezená; část větší než 16 MiB je odmítnuta.
+nezávislého klienta po vypnutí místního obrazu. Na svém RPi jsem vyzkoušel plynulý obraz při 15 FPS i při 10 FPS. Paměť parseru je omezená; část větší než 16 MiB je odmítnuta.
 
-Krátké vzorky stejné Cam1: WebKit 23,8 % → 17,8 % jednoho jádra; celková zátěž
-12,5 % → 11,5 %. Jde o orientační měření, nikoli dlouhodobý benchmark nebo záruku úspory.
+Při ladění jsem sledoval i CPU. Krátké vzorky beru jen orientačně;
+výsledek nepřenáším jako záruku úspory na jinou sestavu.
 
-## Přepínání za běhu — testovací verze 0.2.4
+## Přepínání za běhu
 
-V menu displeje pod seznamem kamer jsou tlačítka 10 FPS, 20 FPS, 30 FPS a Neomezeně.
-Aktuální limit je v popisku a příslušné tlačítko je zvýrazněné. Menu po změně zůstává
+Menu jsem uspořádal v pořadí kamery, vypnout/zapnout obraz, nadpis Limity snímků,
+naměřené FPS a tlačítka. Vybraný limit poznáš podle zvýrazněného tlačítka. Menu po změně zůstává
 otevřené; zavřeš jej křížkem nebo klepnutím mimo ně. Změna nevytváří nové spojení,
 nemění kameru a nezapíná vypnutý obraz. Platí společně pro všechny místní kamery.
 
@@ -62,7 +64,7 @@ nepřidává podruhé: 10, 20, 30 / Neomezeně.
 Nové texty mají překlady ve všech 32 JSON souborech. Přepínání je ověřeno lokálními
 transportními a browser testy; GTK/WebKit na cílovém RPi musí potvrdit testovací nasazení.
 
-## Měření skutečně předávaných FPS — 0.2.5
+## Měření přijímaných a předaných snímků
 
 Menu ukazuje Zdroj a Předáváno. Hodnoty se počítají podle celých přijatých a skutečně
 odeslaných MJPEG částí, nezávisle na nastaveném limitu, v intervalu zhruba 2 sekund.

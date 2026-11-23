@@ -1,5 +1,9 @@
 # Hardwarová akcelerace WebKitu
 
+[English](ACCELERATION.md) · [Česky](ACCELERATION.cs.md)
+
+Při ladění zátěže CPU jsem přidal volbu politiky vykreslování WebKitu. Na své tiskárně jsem vyzkoušel režim on; výchozí off ponechávám kvůli kompatibilitě s různými grafickými ovladači. Tato volba sama nepotvrzuje hardwarové dekódování MJPEG.
+
 Od 0.2.2 je v KlipperScreenCam.conf podporovaná tato volba:
 
 ```ini
@@ -16,8 +20,8 @@ hardware_acceleration = off
 Bez uvedení parametru se použije off, aby aktualizace nezměnila funkční instalaci.
 Název hodnoty se neodvíjí od motivu ani od Mainsailu. Parametr se načítá při startu aplikace.
 
-Původní off bylo konzervativní rozhodnutí při stavbě vloženého rozhraní, ne doložená
-nutnost na RPi. Na konkrétním zařízení má smysl porovnat on proti off.
+Režim off jsem ponechal jako výchozí pro kompatibilitu, nikoli jako doloženou
+nutnost pro každý Raspberry Pi. Na konkrétním zařízení má smysl porovnat on proti off.
 
 **Jde o politiku vykreslování WebKitu, nikoliv přímý přepínač hardwarového MJPEG dekodéru.**
 Skutečné použití GPU závisí na ovladači a grafické relaci. Log potvrzuje požadovanou
@@ -28,7 +32,7 @@ Zdroj významu voleb: [WebKitGTK HardwareAccelerationPolicy](https://webkitgtk.o
 
 ## Porovnání na RPi
 
-1. Aktualizuj zdroje na 0.2.2 dle UPDATE.cs.md, zachovej konfiguraci a výchozí off.
+1. Použij aktuální instalaci; postup aktualizace je v UPDATE.cs.md. Zachovej konfiguraci a pro první měření nastav off.
 2. Vyber stejnou kameru, zapni obraz a ponech stejný počet ostatních diváků jako při dalším měření.
 3. Po několika sekundách ustálení zaznamenej CPU:
 
@@ -63,8 +67,8 @@ Sleduj i plynulost a případné grafické chyby; pouhý pokles jednoho procesu 
 
 Přes SSH vrať hardware_acceleration na off a restartuj KlipperScreenCam.
 Není potřeba restartovat Klipper, Crowsnest nebo RPi ani měnit ovladače a boot konfiguraci.
-Pokud režim on nenaběhne, pošli log a aktuální nastavení grafiky; neřeš to náhodnými
+Pokud režim on nenaběhne, k hlášení chyby mi přilož log a aktuální nastavení grafiky. Vyhni se náhodným
 změnami oprávnění k /dev/dri nebo vypínáním bezpečnostních funkcí.
 
 Volba akcelerace nemění skutečné vypnutí streamu: místní síťové spojení dál vlastní
-Python a při vypnutí jej uzavře. Výsledek akceleračního pokusu na RPi zatím není potvrzený.
+Python a při vypnutí jej uzavře. Na mém RPi režim on běžel. Samostatné měření skutečného využití GPU nemám.

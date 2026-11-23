@@ -1,4 +1,8 @@
-# Nasazení testovací verze 0.2.4
+# Archivní postup pro verzi 0.2.4
+
+> Archivní poznámky: aktuální postup je v [instalaci](DEPLOY.cs.md).
+
+Tento postup si ponechávám jako záznam vývoje. Pro verzi 0.3.0 použij [aktuální nasazení a kontrolu](TEST_0.3.0.cs.md). Chování staršího menu se od aktuální verze liší.
 
 Přenes KlipperScreenCam-0.2.4.tar.gz do /home/horejsi na RPi.
 Příkazy jsou pro uživatele horejsi a existující funkční instalaci.
@@ -42,6 +46,6 @@ požadovanou výchozí hodnotu (např. 10 nebo 15) a restartuj. Ověř i změnu 
 Pokud chceš nyní načíst nové povolení služby v Moonrakeru, ve vhodnou dobu
 mimo tisk spusť `sudo systemctl restart moonraker`. Viz MOONRAKER.cs.md.
 
-Návrat: zastav KlipperScreenCam, uchovej testovací adresář pod novým názvem,
+Návrat: zastav KlipperScreenCam, uchovej adresář s novou verzí pod novým názvem,
 obnov adresář a konfiguraci ze záloh before-0.2.4 a spusť službu. Nastavení
 monitorů ani dotyků se tímto nasazením nemění.

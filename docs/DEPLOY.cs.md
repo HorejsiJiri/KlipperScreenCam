@@ -1,5 +1,9 @@
 # První nasazení archivu 0.3.0
 
+[English](DEPLOY.md) · [Česky](DEPLOY.cs.md)
+
+KlipperScreenCam instaluji jako samostatnou službu vedle KlipperScreenu. V tomto návodu popisuji instalaci z vydaného balíčku. Nastavení monitorů a dotyků nechávám oddělené, aby šlo kamerový náhled měnit bez zásahu do ovládání tiskárny.
+
 Balíček neobsahuje osobní nastavení ani soubory z běžícího RPi. Na RPi je potřeba zachovat
 současné HDMI rozložení a mapování dotyků. Pro první zkoušku není potřeba restartovat celé RPi.
 
@@ -112,3 +116,28 @@ Při odinstalaci lze odstranit pouze řádek `KlipperScreenCam` a znovu načíst
 Oficiální dokumentace: [povolené služby](https://moonraker.readthedocs.io/en/latest/configuration/#allowed-services)
 a [restart přes API](https://moonraker.readthedocs.io/en/latest/external_api/machine/#restart-a-system-service).
 
+
+## Společné probouzení a úspora CPU při uspání
+
+Po základní instalaci mohu zapnout integraci KlipperScreenu:
+
+```bash
+cd ~/KlipperScreenCam
+bash scripts/install.sh --no-deps --shared-wake
+python3 launcher.py --check
+```
+
+Pokud oba příkazy uspějí, mimo tisk restartuji obě služby:
+
+```bash
+sudo systemctl restart KlipperScreen
+sudo systemctl restart KlipperScreenCam
+```
+
+Do existující sekce `[display]` patří `pause_on_dpms = true` a
+`dpms_poll_seconds = 20`. Výchozí hodnoty platí i bez těchto řádků.
+Nevytvářím druhou sekci `[display]`. Limit FPS zůstává v `[stream]`.
+Úprava vytváří zálohy souborů KlipperScreenu; při neznámé podobě zdrojů se zastaví.
+Po aktualizaci KlipperScreenu integraci znovu zkontroluji.
+
+[Úplný postup, ověření a návrat k záloze](RPI_SLEEP.cs.md).

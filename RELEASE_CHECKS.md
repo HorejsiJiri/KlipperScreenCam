@@ -1,71 +1,45 @@
-# Release checks — 0.3.0
+# Release checklist — 0.3.0
 
-Date: 2026-11-22. First public release baseline, with a default local limit of 15 FPS.
+I keep this checklist for maintaining releases. Installation and configuration are
+covered in README.md and the deployment guides; test counts do not belong in the
+main user guide.
 
-## Local checks completed
+## Checks I use before release
 
-- Python unittest: 48 tests run, 47 passed, 1 skipped (native Linux/systemd verification).
-- All 32 JSON locales and the example configuration validated.
-- Headless Edge/Playwright UI checks passed: selection, reconnect, pause/resume,
-  same-camera resume, one camera, scrolling, long labels, theme changes, hidden cursor,
-  escaped names, all locales and RTL.
-- Real continuous multipart MJPEG tests cover upstream closure, stale URLs, camera
-  switching, local frame limiting, original JPEG bytes, fragmented multipart data,
-  streams without Content-Length and an independent second client.
-- The Linux GitHub Actions workflow additionally runs native systemd validation.
-
-The application sources were published in commit c73b19fa2e090f68ef9c027bedb451dc766c597c.
-[GitHub Actions passed](https://github.com/HorejsiJiri/KlipperScreenCam/actions/runs/45071373818),
-including native Linux/systemd validation. All 78 committed files matched the source package.
-The release documentation wording is finalized separately; current checks remain visible in Actions.
-
-## Target deployment
-
-The user confirmed picture, touch controls and automatic startup on Raspberry Pi 5,
-Debian 13, X11 and two 1024 × 600 HDMI touch displays. Actual stream shutdown was
-confirmed using logs and sockets, with a short total CPU sample falling to about 2%.
-Version 0.2.3 was deployed with max_fps = 15 and the user confirmed smooth video.
-Same-camera short samples showed WebKit at 23.8% versus 17.8% of one core;
-these do not constitute a controlled benchmark.
-
-WebKit acceleration policy on was requested successfully; actual GPU decoding is
-not established. All new translations, themes and failure scenarios have not been
-exhaustively tested. Moonraker service control instructions are based on upstream
-documentation and have not yet been user-verified on the target.
-
-See docs/VERIFICATION.cs.md and docs/TESTING.cs.md for scope and remaining checks.
-
-## Packaging
+- Validate configuration, all 32 locale files and Python syntax.
+- Run core and real MJPEG transport tests.
+- Run browser checks for touch controls, menu layout, languages and FPS selection.
+- Verify the generated systemd unit on Linux.
+- Build source archives and SHA-256 checksums without live printer configuration or logs.
 
 ```bash
+python3 -m unittest discover -s tests -v
+python3 launcher.py --check-locales
+python3 launcher.py --config config/KlipperScreenCam.conf --check
 python3 scripts/package.py
 ```
 
-ZIP/TAR.GZ archives and SHA-256 checksums exclude Git metadata, caches and runtime
-files. They contain sample configuration and a synthetic test JPEG, not live printer
-configuration, logs or private camera images. The existing Moonraker service allowlist
-is preserved; the installer appends its service once and keeps a first-change backup.
-Four installer tests cover preservation, idempotence, file creation, missing directories
-and retention of an existing backup.
+The [Checks run for the released commit](https://github.com/HorejsiJiri/KlipperScreenCam/actions/runs/45075895035)
+and the [publish run](https://github.com/HorejsiJiri/KlipperScreenCam/actions/runs/45075950633)
+completed successfully. I published [v0.3.0](https://github.com/HorejsiJiri/KlipperScreenCam/releases/tag/v0.3.0)
+with ZIP, TAR.GZ and SHA-256 files.
 
-## New controls awaiting target testing
+## Practical checks
 
-Live 10/20/30/unlimited selection, changes while paused, unchanged stream URL,
-all translated FPS labels and case-insensitive unlimited configuration passed locally.
-A real source test switches a running limited connection to unlimited without
-opening a second camera connection. Default configuration remains 15 FPS.
+I test on my Raspberry Pi 5 printer with two HDMI touch displays. My practical
+observations and remaining device-specific checks are in [the validation notes](docs/VERIFICATION.md).
+Automated checks support this work; they do not establish compatibility with every
+camera, display, theme or graphics driver.
 
-## FPS diagnostics
+New translations still need native-speaker review. I have not independently
+measured hardware MJPEG decoding. The public release does not implement synchronized
+display wake-up or automatic stream pause when a monitor powers down.
 
-All live presets were tested against a real source faster than 30 FPS. Actual
-forwarded counters changed with each limit on one connection, and unlimited
-matched source frame rate. UI checks cover both rate labels in all 32 languages.
-On the target, logs confirm menu choices reach the host, but actual FPS effect
-still needs the new counters. No production root cause is asserted.
+## RPi sleep/wake verification — 2026-11-23
 
-## Revised menu 0.3.0
-
-UI checks verify section order, custom 15/20/120/unlimited configuration, numeric
-button widths, three buttons in the first row, remaining-space alignment, red
-video toggle and slash visibility when paused/resumed. Local screenshot inspected.
-Target GTK/WebKit validation of this layout remains pending.
+I verified shared display wake, immediate local stream resume and operation after
+reboot on my Raspberry Pi 5. DPMS sleep monitoring closes the local connection;
+manual pause is preserved by the implementation. The FIFO path was checked through
+application logs. Both services must restart after installing the integration.
+Linux-specific library and FIFO behavior also require the actual target environment;
+Windows checks alone do not establish these results.

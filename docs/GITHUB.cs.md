@@ -1,47 +1,57 @@
-# Příprava pro GitHub
+# Jak udržuji projekt a vydávám balíčky
 
-Balíček obsahuje anglický README, český README, konfiguraci, návody, jazykové soubory,
-testy a workflow GitHub Actions. Zdrojový adresář má vlastní lokální Git repozitář;
-archivy záměrně neobsahují jeho interní metadata ani lokální cache.
+[English](GITHUB.md) · [Česky](GITHUB.cs.md)
 
-Projekt je samostatný a není oficiální komponentou KlipperScreenu. Názvy jazyků vycházejí
-z veřejného snapshotu; naše nové překlady jsou samostatné návrhy k revizi. Licence projektu
-zatím nebyla vlastníkem vybraná — tato příprava ji automaticky nepřiřazuje.
+Projekt zveřejňuji v repozitáři [HorejsiJiri/KlipperScreenCam](https://github.com/HorejsiJiri/KlipperScreenCam).
+Verze 0.3.0 už má vlastní [vydání](https://github.com/HorejsiJiri/KlipperScreenCam/releases/tag/v0.3.0)
+s instalačními archivy a kontrolními součty. Následující postup si ponechávám pro další změny.
 
-Před nahráním zkontroluj, že nepřidáváš skutečnou konfiguraci tiskárny, logy, hesla nebo
-soukromé snímky kamer. V `config/` patří vzorová konfigurace; živý soubor zůstává v printer_data.
+## Běžná práce se zdroji
 
-Pokud pracuješ s rozbaleným archivem bez .git, vytvoř repozitář:
+Pracuji v klonu existujícího repozitáře. Nevytvářím kvůli každému vydání nový
+repozitář a nepřepisuji jeho historii. Před odesláním zkontroluji změny:
 
 ```bash
-git init -b main
+git status
+git diff
+git remote -v
 ```
 
-Po kontrole souborů můžeš připravit první commit:
+Do repozitáře patří vzorová konfigurace, zdroje, dokumentace, překlady a testy.
+Živou konfiguraci tiskárny, hesla, logy a soukromé obrazy kamer do něj nepřidávám.
 
 ```bash
 git add .
-git commit -m "Release KlipperScreenCam 0.3.0"
+git commit -m "Update KlipperScreenCam documentation"
+git push origin main
 ```
 
-Na GitHubu založ prázdný repozitář KlipperScreenCam. V následujícím příkladu nahraď
-TVUJ_UCET vlastním účtem nebo organizací:
+Použij zprávu odpovídající své změně. Pokud přispíváš z vlastního účtu, připrav
+větev nebo fork a pull request místo přímého zápisu do mé větve main.
+
+## Vydání
+
+Pro publikování používám ručně spouštěný postup **Publish release** v GitHub Actions.
+Verzi čte z projektu, sestaví ZIP a TAR.GZ, přidá SHA-256 a před zveřejněním ověří
+úspěšný výsledek běžných kontrol pro stejný commit. Existující vydání nepřepisuje.
+
+1. U nové verze uprav číslo v pyproject.toml i src/klipperscreencam/__init__.py.
+2. Doplň changelog a odpovídající dokumentaci.
+3. Odešli změny a počkej na zelené Checks.
+4. V Actions otevři Publish release a spusť Run workflow pro main.
+5. Zkontroluj dokončení a přílohy nového vydání.
+
+Samotné lokální zabalení nic nepublikuje:
 
 ```bash
-git remote add origin https://github.com/TVUJ_UCET/KlipperScreenCam.git
-git push -u origin main
+python3 scripts/package.py
 ```
 
-Pokud origin už existuje, nejdříve ověř jeho URL pomocí `git remote -v`; nevytvářej druhý
-origin a neměň jej naslepo. GitHub Actions pak spustí kontroly. Jejich výsledek zkontroluj
-před označením releasu a přiložením archivů. V této přípravě žádný push ani publikace neproběhly.
+## Changelog a překlady
 
-## První veřejný balíček a changelog
+Přípravné iterace jsem shrnul do prvního vydání 0.3.0. Další veřejná vydání budou
+mít vlastní sekci s verzí a datem; starší záznamy ponechávám. Překlady mají vlastní
+JSON soubory. Připomínky rodilých mluvčích uvítám.
 
-Aktuální baseline je 0.3.0. CHANGELOG.md slučuje přípravné iterace do jednoho
-přehledu prvního vydání. Pro další zveřejněné změny přidej novou sekci s verzí
-a datem; již publikované záznamy zachovej. Zdrojové soubory nyní nahraď běžným
-commitem v existujícím repozitáři, bez přepisování historie a bez smazání .git.
-Nezakládej duplicitní repozitář. Nahraj i .github, .gitignore a .gitattributes.
-Po nahrání ověř Actions; teprve pak vytvoř tag v0.3.0 a Release s aktuálními archivy
-a SHA256SUMS. Toto lokální balení samo GitHub nemění.
+KlipperScreenCam není oficiální komponenta KlipperScreenu. Licenci projektu jsem
+zatím nezvolil.

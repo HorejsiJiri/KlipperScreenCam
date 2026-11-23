@@ -18,6 +18,7 @@ from .i18n import load_language, html_language
 from .moonraker import list_cameras, startup_camera
 from .theme import klipperscreen_settings, theme_directory, icon_data, palette
 from .stream import StreamProxy
+from .power import DisplayPower, DPMSMonitor, WakePipe
 
 LOG = logging.getLogger(__name__)
 
@@ -31,6 +32,10 @@ class Viewer(Gtk.Window):
         self.stopped = False
         self.cameras = []
         self.streams = StreamProxy(timeout=settings.request_timeout, max_fps=settings.max_fps)
+        self.power = DisplayPower(self.streams.stop, self.display_power_changed)
+        self.dpms = DPMSMonitor(settings.display) if settings.pause_on_dpms else None
+        if self.dpms:
+            self.power.update(self.dpms.is_on())
         self.stream_generation = -1
         self.appearance_signature = None
         self.messages = {}
@@ -60,12 +65,29 @@ class Viewer(Gtk.Window):
                            settings.web_url + "/")
         GLib.timeout_add_seconds(settings.poll_seconds, self.update_appearance)
         GLib.timeout_add_seconds(2, self.update_stream_stats)
+        self.wake_pipe = None
+        self.wake_watch = None
+        if self.dpms:
+            GLib.timeout_add_seconds(settings.dpms_poll_seconds, self.check_display_power)
+            try:
+                self.wake_pipe = WakePipe()
+                self.wake_watch = GLib.io_add_watch(self.wake_pipe.fd, GLib.IO_IN,
+                                                   self.wake_notified)
+            except OSError as error:
+                LOG.warning("Wake notifications unavailable; using DPMS fallback: %s", error)
 
     def close(self, *_):
         if self.stopped:
             return
         self.stopped = True
         self.streams.close()
+        if self.wake_watch is not None:
+            GLib.source_remove(self.wake_watch)
+            self.wake_watch = None
+        if self.wake_pipe:
+            self.wake_pipe.close()
+        if self.dpms:
+            self.dpms.close()
         Gtk.main_quit()
 
     def javascript(self, function, data):
@@ -94,6 +116,7 @@ class Viewer(Gtk.Window):
                 "hideCursor": self.settings.hide_cursor,
                 "hideNameSingle": self.settings.hide_name_single,
                 "startPaused": self.settings.start_paused,
+                "displaySleeping": self.power.sleeping,
                 "maxFps": self.streams.max_fps,
                 "configuredMaxFps": self.settings.max_fps,
                 "retryInitial": self.settings.retry_initial,
@@ -101,6 +124,30 @@ class Viewer(Gtk.Window):
             })
             self.update_appearance()
             self.load_cameras()
+
+    def display_power_changed(self, sleeping):
+        LOG.info("DPMS display %s; local stream %s", "sleep" if sleeping else "wake",
+                 "closed" if sleeping else "resume requested (manual pause preserved)")
+        self.javascript("KSC.setDisplayPower", {"sleeping": sleeping})
+
+    def wake_notified(self, _fd, _condition):
+        if self.stopped:
+            return False
+        try:
+            if self.wake_pipe.read_wake():
+                LOG.info("Wake notification received from local FIFO")
+                self.power.update(True)
+        except OSError as error:
+            LOG.warning("Wake notification read failed: %s", error)
+            self.wake_watch = None
+            return False
+        return True
+
+    def check_display_power(self):
+        if self.stopped:
+            return False
+        self.power.update(self.dpms.is_on())
+        return True
 
     def update_stream_stats(self):
         if self.stopped:
@@ -131,6 +178,10 @@ class Viewer(Gtk.Window):
                 self.stream_generation = generation
                 uid = data.get("uid")
                 if uid is None:
+                    self.streams.stop()
+                    self.javascript("KSC.streamStopped", {"generation": generation})
+                    return
+                if not self.power.permits_stream():
                     self.streams.stop()
                     self.javascript("KSC.streamStopped", {"generation": generation})
                     return

@@ -1,5 +1,7 @@
 # Contributing
 
+I welcome bug reports, improvements and translation corrections. This is the workflow I use for contributions.
+
 KlipperScreenCam is independent, not an official KlipperScreen component.
 Include the observed environment and validation results with bug reports or changes.
 
@@ -36,4 +38,11 @@ GTK/WebKitGTK and systemd need additional Linux/RPi validation. Browser tests do
 a successful RPi installation. Do not bundle private configuration, credential-bearing
 camera URLs, logs or camera images.
 
-The project owner's license choice is pending; this document does not assign a license.
+I have not selected a project license yet.
+
+## Documentation languages
+
+English is primary (`README.md` and `docs/*.md`); Czech is secondary
+(`README.cs.md` and matching `docs/*.cs.md`). Keep commands and defaults aligned
+in both versions. The old TEST_0.2.x and TEST_0.3.0 notes are historical deployment
+records, not the current installation guide. Start at [deployment](docs/DEPLOY.md).

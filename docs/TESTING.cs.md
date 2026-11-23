@@ -1,5 +1,9 @@
 # Ověření
 
+[English](TESTING.md) · [Česky](TESTING.cs.md)
+
+Při vývoji kombinuji automatické kontroly s praktickými zkouškami na tiskárně. Níže je postup, který používám pro ověření změn. Seznam scénářů není tvrzením, že jsem všechny z nich dokončil; konkrétní výsledky zaznamenávám do VERIFICATION.cs.md.
+
 ## Lokální kontroly bez RPi
 
 ```bash
@@ -24,7 +28,7 @@ Tyto kontroly nejsou důkazem správného chování GTK/WebKitGTK na RPi.
 
 ## Pilot na RPi
 
-1. Ověřit dvě oddělené plochy a dotyky. Na HDMI-1 KlipperScreen, na HDMI-2 naše okno.
+1. Ověřit dvě oddělené plochy a dotyky. Na HDMI-1 KlipperScreen, na HDMI-2 okno KlipperScreenCam.
 2. Výchozí kamera podle UID; jiný výběr během provozu; restart na pevnou výchozí kameru.
 3. Souběžný obraz v Mainsailu, KlipperScreenu a KlipperScreenCam.
 4. Otevření/zavření kamery v KlipperScreenu; druhý displej se nesmí trvale zaseknout.

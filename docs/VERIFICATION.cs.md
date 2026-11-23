@@ -1,73 +1,58 @@
-# Stav ověření — 0.3.0
+# Moje sestava a ověření
 
-Datum: 2026-11-22. Výsledky cílového nasazení jsou oddělené od místních testů.
+[English](VERIFICATION.md) · [Česky](VERIFICATION.cs.md)
 
-## Potvrzeno na cílovém RPi
+Projekt vyvíjím a zkouším na své tiskárně. Tuto stránku si nechávám jako technický
+záznam; pro běžnou instalaci stačí hlavní návod a kontrola obrazu, dotyků a startu.
 
-Raspberry Pi 5 Model B Rev 1.0, Debian 13.8 Trixie, X11,
-dva HDMI dotykové displeje 1024 × 600, rozšířená plocha 2048 × 600.
+## Na čem aplikaci používám
 
-- Uživatel potvrdil obraz, ovládání a automatický start samostatné služby.
-- Zachováno rozložení displejů a mapování obou dotyků.
-- Výchozí kamera funguje podle přesného názvu i UID z Moonrakeru.
-- Vypnutí obrazu uzavírá přenos: doložen log uzavření a žádné TCP spojení hlavního
-  procesu. V krátkém vzorku celková zátěž klesla přibližně z 15 % na 2 %.
-- Nastavení akcelerace on bylo načteno a aplikace pokračovala v provozu.
-  Log potvrzuje požadovanou politiku, nikoli skutečné GPU dekódování.
-- Verze 0.2.3 s max_fps = 15 byla nasazena; uživatel výslovně potvrdil plynulý obraz.
+- Raspberry Pi 5 Model B Rev 1.0, Debian 13.8 Trixie.
+- KlipperScreen přes X11 a dva dotykové HDMI displeje 1024 × 600.
+- Rozšířená plocha 2048 × 600, KlipperScreen vlevo, kamerový náhled vpravo.
+- Kamery zpřístupněné přes Crowsnest a zapsané v Moonrakeru.
 
-## Orientační CPU měření
+## Co jsem ověřil na tiskárně
 
-Cam1, zapnutá politika akcelerace, jednosekundové vzorky top před/po místním limitu:
+Ověřil jsem obraz, dotykové ovládání a automatický start samostatné služby.
+Při přechodu ze společného spouštěcího skriptu jsem zachoval rozložení monitorů
+a mapování dotyků. Výchozí kameru jsem vyzkoušel podle přesného názvu i UID.
 
-| Metrika | Předchozí limit 30 FPS | Limit 15 FPS |
-|---|---:|---:|
-| WebKit, % jednoho jádra | 23,8 | 17,8 |
-| Python náhledu, % jednoho jádra | 6,9 | 5,9 |
-| Crowsnest Cam1, % jednoho jádra | 10,9 | 12,9 |
-| Celý CPU, % všech jader | 12,5 | 11,5 |
+Skutečné vypnutí přenosu jsem kontroloval přes log uzavřeného spojení a otevřené
+TCP sockety. Po vypnutí nezůstával hlavnímu procesu náhledu otevřený kamerový
+přenos. Tím se liší vypnutí obrazu od pouhého skrytí videa.
 
-Nejde o dlouhodobý řízený benchmark. Vzorky naznačují snížení práce WebKitu;
-nelze z nich slibovat konkrétní úsporu na jiném zařízení. Crowsnest dodává původní
-stream, proto se jeho zátěž místním limitem přímo nesnižuje.
+Na své tiskárně jsem označil obraz za plynulý při 15 FPS a později také při 10 FPS.
+Vyzkoušel jsem požadavek na akceleraci WebKitu v režimu on. Log potvrzuje nastavenou
+politiku, ale nemám z něj důkaz o hardwarovém dekódování MJPEG.
 
-## Místní kontroly
+## Jak chápu měření
 
-- Konfigurace, jazyky, výchozí kamera, GTK nastavení a generování služby.
-- 32 jazykových variant, regionální aliasy, RTL metadata, JSON klíče a fallback.
-- Reálný nepřetržitý MJPEG server: skutečné zavření spojení a zastavení bajtů,
-  staré adresy, přepnutí kamery, limit snímků, zachování JPEG dat,
-  fragmentované části bez Content-Length a nezávislý druhý klient.
-- Browser testy: výběr, pauza, zapnutí výběrem, jedna kamera, dlouhé názvy,
-  posun, motiv bez restartu streamu, kurzor, bezpečné názvy a jazyky/RTL.
+Krátké výpisy top mi pomohly při ladění, nepovažuji je ale za řízený benchmark.
+Proto konkrétní procenta CPU nepoužívám jako slib úspory pro jinou tiskárnu.
 
-Aktuální počet kontrol je v [RELEASE_CHECKS.md](../RELEASE_CHECKS.md).
-Windows přeskakuje skutečné systemd ověření; to spouští Linux CI.
+FPS v menu počítám z přijatých a předaných celých snímků. Údaj Předáváno není
+měřením skutečného vykreslení WebKitu. Log přepnutí limitu dokládá přijetí volby,
+sám o sobě nedokládá změnu toku snímků.
 
-## Zbývá ověřit
+## Co ověřují automatické kontroly
 
-- Všech 30 nových překladů rodilými mluvčími, veškeré CJK/RTL fonty na RPi.
-- Všechny motivy, dlouhodobé výpadky, tiché zastavení kamery a souběhy klientů.
-- Zhasnutí/probuzení obou výstupů. DPMS sám nepozastavuje přenos.
-- Skutečnou GPU aktivitu a dlouhodobé CPU srovnání.
-- Moonraker správu služby podle nového návodu na cílové instalaci.
+Kontroly zahrnují konfiguraci a překlady, vytváření služby, skutečný MJPEG přenos,
+zavření spojení, omezení FPS, změnu limitu bez nového spojení a nezávislého druhého
+klienta. Browser testy kontrolují rozložení menu, vlastní limit, překlady, dlouhé
+názvy a chování vypnutí/zapnutí. Linux CI ověřuje systemd jednotku.
 
-Podrobnosti: [TESTING.cs.md](TESTING.cs.md), [FPS.cs.md](FPS.cs.md).
+Výsledek vydání zaznamenávám v [RELEASE_CHECKS.md](../RELEASE_CHECKS.md).
 
-## Nové v 0.2.4
+## Co nechávám k dalšímu ověření
 
-Přepínání limitu v menu a unlimited byly ověřeny místními testy skutečného přenosu
-a rozhraní. Nové ovládání zatím není ověřeno na cílovém GTK/WebKit. Výše uvedené
-výsledky RPi patří předchozí verzi 0.2.3.
+Nemám vyzkoušené všechny motivy, kamery, grafické ovladače ani všechny kombinace
+výpadků a souběžných klientů. Nové překlady potřebují jazykovou kontrolu a část
+RTL/CJK vykreslení stále vyžaduje praktické ověření na displeji.
 
-## Diagnostika 0.2.5
+U nového rozložení menu a čítačů nepovažuji samotný browser test za zkoušku všech
+situací na GTK/WebKitu v RPi. Podobně si ponechávám samostatnou kontrolu správy
+služby přes Moonraker. Společné probouzení a okamžité obnovení obrazu jsem ověřil na svém RPi,
+včetně restartu. Podrobnosti jsou v [návodu k uspávání](RPI_SLEEP.cs.md).
 
-Log RPi potvrdil přijetí unlimited, 10, 20 a 30 z menu. To samo neprokazuje změnu FPS.
-Nové počítadlo zdroje a předaných snímků čeká na ověření na RPi. Reálný místní
-server a test všech voleb potvrdily změnu počtu předaných snímků na stejném spojení.
-
-## Vzhled menu 0.3.0
-
-Nové pořadí, ikona a barva ovládání obrazu, vlastní řazené předvolby, rozměry a
-zarovnání tlačítek byly zkontrolovány browser testem i náhledem. Nové rozložení
-a ovládání vlastní hodnoty limitu na cílovém RPi ještě nejsou potvrzené.
+Vlastní kontrolní postup je v [TESTING.cs.md](TESTING.cs.md).

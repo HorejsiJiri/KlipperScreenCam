@@ -1,6 +1,10 @@
 # Jazykové soubory
 
-Jeden jazyk = jeden UTF-8 JSON soubor v `locales/`. Bez gettextu a bez kompilace.
+[English](TRANSLATIONS.md) · [Česky](TRANSLATIONS.cs.md)
+
+Jazykové soubory jsem zvolil jako jednoduché JSON, aby se daly upravovat běžným editorem a nový jazyk nevyžadoval změnu programu. Pro každý jazyk je samostatný soubor. Výběr jazyka se může řídit KlipperScreenem.
+
+Jeden jazyk má jeden UTF-8 JSON soubor v `locales/`. Překlad nevyžaduje gettext ani kompilaci.
 Texty lze upravit běžným editorem nebo přímo na GitHubu.
 
 ## Jazyky podle oficiálního KlipperScreenu
@@ -11,10 +15,10 @@ pt pt_BR rs ru sk sl sv tr uk vi zh_CN zh_TW
 ```
 
 Zdroj, datum a commit seznamu jsou v UPSTREAM_LOCALES.json. Přebírá se seznam
-identifikátorů, nikoliv gettext soubory nebo oficiální schválení našich překladů.
-Naše aplikace má vlastní texty. Nových 30 překladů je připravených s pomocí AI a označených
+identifikátorů, nikoliv gettext soubory nebo oficiální schválení mých překladů.
+KlipperScreenCam má vlastní texty. Dalších 30 překladů jsem připravil s pomocí AI a označil
 `_meta.review_status = needs-native-review`. Čeština a angličtina byly součástí základu;
-čeština byla použita při ověřeném nasazení.
+češtinu používám na své tiskárně.
 
 Názvy souborů zachovávají upstream: například `de_formal.json`, `pt_BR.json`,
 `jp.json`, `rs.json`, `zh_CN.json` a `zh_TW.json`.
@@ -26,7 +30,7 @@ Názvy souborů zachovávají upstream: například `de_formal.json`, `pt_BR.jso
 3. Překládej hodnoty vpravo; klíče vlevo neměň.
 4. Pro pravolevé jazyky nastav `_meta.direction = rtl`, jinak ltr nebo údaj vynech.
 5. Spusť `python3 launcher.py --check-locales`.
-6. V KlipperScreenCam.conf nastav `language = fi` a restartuj naši službu.
+6. V KlipperScreenCam.conf nastav `language = fi` a restartuj službu KlipperScreenCam.
 
 Příklad začátku souboru (finální soubor musí obsahovat všechny klíče z en.json):
 
@@ -69,5 +73,5 @@ Pro všechna písma na minimálním OS může být potřeba:
 sudo apt install --no-install-recommends fonts-noto-core fonts-noto-cjk
 ```
 
-Instalátor 0.2.0 přidává tato písma mezi závislosti. Při --no-deps je musí zajistit správce.
+Instalátor přidává tato písma mezi závislosti. Při --no-deps je musí zajistit správce.
 Skutečné RTL/CJK vykreslení ještě vyžaduje ověření na cílovém displeji.

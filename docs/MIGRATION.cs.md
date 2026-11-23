@@ -1,9 +1,13 @@
 # Přechod z původního náhledu
 
+[English](MIGRATION.md) · [Česky](MIGRATION.cs.md)
+
+Než jsem projekt oddělil, spouštěl jsem kamerový náhled společně s KlipperScreenem ze skriptu start-displays.sh. Pokud máš podobné řešení, tento postup ti pomůže přejít na samostatnou službu a zachovat funkční displeje i dotyky.
+
 Nová aplikace je samostatná služba. Staré náhledové soubory nemaž, dokud není nový projekt
 ověřený. Instalátor do starého spouštění sám nezasahuje.
 
-## Původní instalace z tohoto chatu
+## Moje původní instalace
 
 Původní náhled spouští `~/.config/KlipperScreen/start-displays.sh` přes `KS_XCLIENT`
 v doplňkové konfiguraci služby KlipperScreen. Tento skript současně nastavuje rozlišení,

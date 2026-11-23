@@ -1,6 +1,10 @@
 # Aktualizace funkční instalace a návrat
 
-Tento postup je pro uživatele, kterému již běží samostatný KlipperScreenCam 0.1.x nebo 0.2.0/0.2.1.
+[English](UPDATE.md) · [Česky](UPDATE.cs.md)
+
+Při aktualizaci si ponechávám konfiguraci tiskárny a zálohu předchozí verze. Tento postup je pro již fungující samostatnou instalaci. První instalaci popisuji v DEPLOY.cs.md.
+
+Postup použij pro přechod ze starší samostatné verze na 0.3.0.
 Konfigurace tiskárny ani HDMI/dotykový wrapper se při aktualizaci nepřepisují.
 Příkazy zadávej na RPi s KlipperScreenCam, nikoliv na jiném serveru.
 

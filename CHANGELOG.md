@@ -1,59 +1,58 @@
 # Changelog
 
-Notable changes to KlipperScreenCam are recorded here. Versions use MAJOR.MINOR.PATCH.
-The initial development iterations are consolidated into the first public release below.
-Future releases get their own dated entry; published release entries are retained.
+[Česky](CHANGELOG.cs.md)
 
-## 0.3.0 — 2026-11-22 
+## 0.3.0 — 2026-11-22
 
-First public release baseline. See RELEASE_CHECKS.md for validation scope.
+### Camera display and controls
 
-### Features
+- Standalone X11 touch camera viewer for Klipper and Moonraker, with a separate
+  service, installer and printer configuration file.
+- Existing HTTP(S) MJPEG streams and camera names from Moonraker. Fixed startup
+  camera by exact name or UID, independent of Mainsail.
+- Full-window video, transparent overlays, theme SVG icons and GTK-computed colors
+  from the local KlipperScreen installation; automatic theme and language changes.
+- Scrollable camera menu, video off/on, measured source/forwarded FPS and live presets.
+  Numeric presets 10/20/30 plus a sorted configured custom value have equal widths;
+  Unlimited fills the remaining second-row space. Runtime changes are not persisted.
+- Local frame limit defaults to 15 FPS, accepts 1–120 or `unlimited`, and drops
+  compressed frames before WebKit without re-encoding. Upstream capture and remote
+  viewers remain independent. Counters are averages rounded to whole numbers.
+- Video off closes the actual local connection. Selecting a camera resumes it.
+- Optional WebKit acceleration policy `off/auto/on`; default off. Hardware MJPEG
+  decoding is not guaranteed.
 
-- Revised menu order: cameras, red icon video toggle, frame-limit heading, measured
-  FPS and preset buttons. Custom configured limits become sorted, deduplicated
-  buttons; Unlimited fills the remaining second-row space. Labels cover 32 locales.
+### Sleep and shared wake
 
-- Live source and forwarded FPS counters in the menu, measured from complete
-  MJPEG frames over two-second sampling intervals; these are not rendered FPS.
-- Real-stream tests verify 10/20/30/unlimited changes on the same active connection.
+- Close the local stream after detecting X11 DPMS sleep, with configurable checks
+  every 20 seconds by default. Keep the existing KlipperScreen blanking timeout.
+- Optional `--shared-wake` integration dismisses KlipperScreen's black overlay and
+  sends a nonblocking FIFO wake message for immediate camera resume.
+- Preserve manual pause, selected camera and runtime FPS limit across sleep/wake.
+- Sleep settings belong in `[display]`. Legacy `[stream]` entries remain accepted
+  with a warning; duplicate definitions across sections are rejected.
+- Guarded KlipperScreen source updates create timestamped backups. Both services
+  must restart after installation. KlipperScreen updates may overwrite the patch.
 
-- Installer registers its service in moonraker.asvc without duplicates, preserves
-  existing services and a first-change backup, and leaves Moonraker restart manual.
+### Installation and documentation
 
-- Standalone second-display camera viewer for Klipper and Moonraker, with its own
-  systemd service, installer and printer configuration file.
-- Camera names and streams from Moonraker; fixed startup camera by exact name or UID,
-  independent of the Mainsail selection.
-- Full-window MJPEG video, transparent overlays and a scrollable touch camera menu.
-- Automatic KlipperScreen theme colors, SVG icons and language selection.
-- Editable JSON translations for 32 language variants, with RTL support.
-- Video off actually closes the local camera connection. Selecting a camera resumes it.
-- Configurable local frame limit: `[stream] max_fps = 15` by default, range 1–120 or `unlimited`.
-  Touch-menu presets: 10, 20, 30 FPS and Unlimited; live changes do not reconnect
-  or resume paused video. Restart restores the configured startup limit.
-  New labels are provided in all 32 locale files.
-  Complete frames are dropped before WebKit without re-encoding; upstream camera
-  traffic and other clients are unaffected.
-- Optional WebKit rendering policy: `[display] hardware_acceleration = off/auto/on`.
-  The default is off; this does not guarantee hardware MJPEG decoding.
-- Step-by-step documentation for installation, two HDMI touch displays, configuration,
-  Moonraker service control and translations; automated core and browser checks.
+- Register the service in `moonraker.asvc` without duplicates, retaining existing
+  entries and a backup. Moonraker restart remains manual.
+- English primary documentation and Czech secondary guides, including step-by-step
+  dual HDMI/touch setup, configuration, migration, sleep/wake and rollback.
+- Editable JSON files for 32 locale variants, including all FPS labels and RTL support.
+  Thirty AI-assisted translations remain open for native-speaker review.
+- Automated configuration, transport, UI and platform checks; detailed evidence
+  stays in RELEASE_CHECKS.md rather than the installation manual.
 
-### Verified deployment
+### Verification and limits
 
-- The preceding 0.2.3 version: user-confirmed video, touch controls and automatic startup on Raspberry Pi 5,
-  Debian 13, X11 and two 1024 × 600 HDMI touch displays.
-- Actual stream closure confirmed with connection logs and socket checks.
-- User-confirmed smooth image at the 15 FPS limit. Short same-camera samples showed
-  WebKit CPU falling from 23.8% to 17.8% of one core; these are not a benchmark.
+I verified the setup on my Raspberry Pi 5 with Debian 13, X11 and two 1024 × 600
+HDMI touch displays, including startup after reboot, shared wake and immediate
+camera resume. Later sleep/wake checks were completed on 2026-11-23 and are included
+under this consolidated 0.3.0 release entry. Smooth 15 and 10 FPS video and actual
+connection shutdown were checked on my printer; CPU observations are not benchmarks.
 
-### Limitations
-
-- HTTP(S) MJPEG and X11 only; no WebRTC, RTSP, HLS or Wayland support.
-- Automatic stream pause on display power-off is not implemented.
-- Thirty AI-assisted translations still need native-speaker review.
-- See RELEASE_CHECKS.md and docs/VERIFICATION.cs.md for validation scope.
-
-Live FPS selection and unlimited mode passed local transport and UI checks; target
-validation of these new controls is pending.
+HTTP(S) MJPEG and X11 only; no WebRTC, HLS, RTSP or Wayland. The optional wake patch
+supports the verified KlipperScreen source layout and refuses unknown layouts.
+Other hardware, drivers, themes and language/font combinations need their own checks.

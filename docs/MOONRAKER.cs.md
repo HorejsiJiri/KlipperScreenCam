@@ -1,5 +1,9 @@
 # Správa KlipperScreenCam přes Moonraker
 
+[English](MOONRAKER.md) · [Česky](MOONRAKER.cs.md)
+
+Pro pohodlnější správu jsem do instalátoru přidal registraci služby v seznamu Moonrakeru. Nemusíš ji tak přidávat ručně a náhled můžeš restartovat přes jeho API. Moonraker instalátor sám nerestartuje.
+
 ## Ovládání služby přes Moonraker
 
 Instalátor automaticky doplní KlipperScreenCam do seznamu bez duplicit a zachová ostatní položky.

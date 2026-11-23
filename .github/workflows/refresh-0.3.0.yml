@@ -1,0 +1,54 @@
+name: Refresh authorized 0.3.0 release
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/refresh-0.3.0.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+jobs:
+  refresh:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate and package
+        run: |
+          python -m unittest discover -s tests -v
+          python launcher.py --check-locales
+          python launcher.py --config config/KlipperScreenCam.conf --check
+          test "$(python launcher.py --version)" = "0.3.0"
+          python scripts/package.py --output dist
+      - name: Wait for Checks and refresh approved release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=v0.3.0
+          expected=dc935a560e8b76d342aa678d3c644d06b213a4d1
+          for attempt in $(seq 1 90); do
+            status="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow checks.yml --commit "$GITHUB_SHA" --limit 1 --json status --jq '.[0].status // "missing"')"
+            if [[ "$status" == completed ]]; then
+              conclusion="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow checks.yml --commit "$GITHUB_SHA" --limit 1 --json conclusion --jq '.[0].conclusion')"
+              [[ "$conclusion" == success ]] || { echo "Checks failed"; exit 1; }
+              break
+            fi
+            [[ "$attempt" != 90 ]] || { echo "Checks timed out"; exit 1; }
+            sleep 5
+          done
+          current="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq .object.sha)"
+          [[ "$current" == "$expected" || "$current" == "$GITHUB_SHA" ]] || { echo "Release tag changed; refusing replacement"; exit 1; }
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null
+          gh release upload "$tag" dist/KlipperScreenCam-0.3.0.zip dist/KlipperScreenCam-0.3.0.tar.gz dist/KlipperScreenCam-0.3.0-SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/$tag" -f sha="$GITHUB_SHA" -F force=true
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "KlipperScreenCam 0.3.0" --notes-file CHANGELOG.md
+          echo "Updated existing v0.3.0 assets and tag to $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

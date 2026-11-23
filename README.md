@@ -3,15 +3,15 @@
 A standalone touch camera display for Klipper and Moonraker, styled to match KlipperScreen.
 Keep printer controls on one HDMI screen and a selected camera on the other.
 
-[Český návod](README.cs.md) · [Second HDMI display and touch setup](docs/SECOND_DISPLAY.cs.md) ·
-[Deployment](docs/DEPLOY.cs.md) · [Translations](docs/TRANSLATIONS.cs.md)
+[Česky](README.cs.md) · [Second HDMI display and touch setup](docs/SECOND_DISPLAY.md) ·
+[Deployment](docs/DEPLOY.md) · [Translations](docs/TRANSLATIONS.md)
 
 **Version 0.3.0.**
-The preceding 0.2.3 version was tested as follows: Video, touch controls and automatic startup were confirmed on a
-Raspberry Pi 5, Debian 13 (Trixie), X11 and two 1024 × 600 touch displays. Actual
-stream shutdown was verified, and the user confirmed smooth video with the default
-15 FPS limit. New translations still need native-speaker review.
-See [verification](docs/VERIFICATION.cs.md) and [release checks](RELEASE_CHECKS.md).
+
+I created KlipperScreenCam for my printer because I wanted KlipperScreen controls
+on one display and a clear, switchable camera view on the other, while keeping
+remote access through Mainsail. My setup uses a Raspberry Pi 5, Debian 13, X11
+and two 1024 × 600 HDMI touch displays. The guides follow this setup.
 
 ## Features
 
@@ -27,7 +27,7 @@ See [verification](docs/VERIFICATION.cs.md) and [release checks](RELEASE_CHECKS.
 - Editable JSON translations for all 32 locale variants in the recorded KlipperScreen snapshot.
 - Arabic, Persian and Hebrew right-to-left menus; regional and legacy locale aliases.
 - Reconnection after reported stream errors, with bounded retry backoff.
-- A separate service, installer and uninstaller; no edits to KlipperScreen source files.
+- A separate service, installer and uninstaller. Optional shared wake applies a backed-up KlipperScreen source patch.
 
 ## Requirements
 
@@ -37,7 +37,7 @@ See [verification](docs/VERIFICATION.cs.md) and [release checks](RELEASE_CHECKS.
 - Two displays and touch inputs already configured on the same X11 desktop.
 
 The app does **not** configure HDMI modes or touch mapping. Follow the separate
-[step-by-step display guide](docs/SECOND_DISPLAY.cs.md) if needed. The tested example
+[step-by-step display guide](docs/SECOND_DISPLAY.md) if needed. The tested example
 uses a 2048 × 600 desktop: printer screen at 0,0; camera screen at 1024,0.
 
 ## Install
@@ -56,7 +56,7 @@ The installer installs dependencies, validates the generated systemd unit and pr
 an existing configuration. By default it does **not** start or enable the service.
 
 If migrating from the earlier shared startup script, first follow
-[migration instructions](docs/MIGRATION.cs.md). Preserve HDMI and touch setup and disable
+[migration instructions](docs/MIGRATION.md). Preserve HDMI and touch setup and disable
 only the old camera process. Do not run both viewers at once.
 
 For a pilot:
@@ -84,10 +84,12 @@ without duplicates or removing existing entries, keeping a first-change backup.
 Restart the matching Moonraker service manually during initial setup.
 The service can then be restarted using `POST /machine/services/restart` with
 `{"service":"KlipperScreenCam"}`, subject to normal Moonraker authorization.
-See the [step-by-step guide](docs/MOONRAKER.cs.md). Use `--moonraker-data-dir PATH` for a custom data directory, or
+See the [step-by-step guide](docs/MOONRAKER.md). Use `--moonraker-data-dir PATH` for a custom data directory, or
 `--skip-moonraker-registration` to leave the allowlist unchanged.
 
 ## Configure
+
+[Complete configuration reference](docs/CONFIGURATION.md) · [Changelog](CHANGELOG.md)
 
 Edit `~/printer_data/config/KlipperScreenCam.conf` in Mainsail or a text editor.
 The full example is [config/KlipperScreenCam.conf](config/KlipperScreenCam.conf).
@@ -104,6 +106,8 @@ y = 0
 width = 1024
 height = 600
 hide_name_single_camera = true
+pause_on_dpms = true
+dpms_poll_seconds = 20
 
 [stream]
 max_fps = 15
@@ -141,10 +145,11 @@ The installer includes Noto core/CJK fonts for minimal systems.
 
 ## Display blanking and limitations
 
-The app leaves X11 DPMS and blanking to the existing system/KlipperScreen setup.
-It does not disable DPMS, and a software-only KlipperScreen screensaver does not automatically
-cover this separate window. DPMS power-off alone does not pause video decoding;
-use the menu's video-off action for that. Automatic pause based on DPMS is not implemented.
+KlipperScreen keeps control of blanking. With `pause_on_dpms = true` the viewer
+closes its local stream after detecting X11 DPMS sleep, normally within 20 seconds.
+The optional shared-wake integration sends an immediate wake notification and
+closes KlipperScreen's black overlay. A software-only screensaver without DPMS
+is not tracked. Follow [sleep and shared wake](docs/RPI_SLEEP.md).
 
 WebRTC/HLS/RTSP, Wayland and direct `/dev/video*` access are not supported.
 Reported stream failures trigger reconnect; a silent stall on an open HTTP connection may not
@@ -163,14 +168,14 @@ bash scripts/uninstall.sh
 ```
 
 Uninstall removes only our service, retaining config/source/translations.
-See [update and rollback](docs/UPDATE.cs.md), [test plan](docs/TESTING.cs.md) and
+See [update and rollback](docs/UPDATE.md), [test plan](docs/TESTING.md) and
 [contribution guide](CONTRIBUTING.md). GitHub Actions runs checks, including real systemd validation on Linux.
 
 ## Project status
 
 KlipperScreenCam is not an official KlipperScreen component. Theme SVG files are read from
-the user's existing installation and are not redistributed here; bundled fallback icons are original.
-The project owner's license choice is pending. See RELEASE_CHECKS.md for the exact published/local verification status.
+your existing installation and are not redistributed here; bundled fallback icons are original.
+I have not selected a project license yet. I keep detailed validation notes in RELEASE_CHECKS.md.
 
 ## Stream-off semantics
 
@@ -185,14 +190,14 @@ remain independent. The loopback transport adds a local relay, not another video
 Set `[display] hardware_acceleration = on` to request accelerated WebKit rendering,
 `auto` for on-demand, or `off` for the original behavior. Missing values default to off.
 This does not guarantee hardware MJPEG decoding. Compare CPU and smoothness on the target;
-see [the acceleration guide](docs/ACCELERATION.cs.md). Restart KlipperScreenCam after changes.
+see [the acceleration guide](docs/ACCELERATION.md). Restart KlipperScreenCam after changes.
 
 ## Local FPS limit
 
 Set `max_fps = 15` in `[stream]` (default 15; range 1–120 or `unlimited`). Complete compressed
 frames are dropped without re-encoding before WebKit. The original upstream stream
 is still read; Mainsail is unaffected. Restart the service after changing configuration.
-The user confirmed smooth video at 15 FPS; CPU samples are documented in [verification](docs/VERIFICATION.cs.md).
+I found both 15 FPS and 10 FPS smooth on my printer. Choose a limit that suits your view; I keep measurement details in [verification](docs/VERIFICATION.md).
 
 The touch menu offers 10, 20, 30 FPS and Unlimited. Changes apply immediately,
 without reconnecting or resuming paused video, and last until service restart.
@@ -201,3 +206,15 @@ without duplicates. Numeric buttons have equal widths; Unlimited fills the rest
 of the second row. The menu order is cameras, video toggle, frame-limit heading,
 measured source/forwarded FPS, then preset buttons.
 Unlimited forwards all available source frames and may increase CPU use.
+
+## Display sleep and shared wake
+
+I verified this setup on my Raspberry Pi 5, including a reboot. Touching either
+screen wakes both displays. The local stream closes after DPMS sleep is detected
+(default check interval: 20 seconds). A local FIFO wake notification resumes video
+without waiting for that interval; manually paused video remains paused.
+
+Set `pause_on_dpms = true` and `dpms_poll_seconds = 20` in `[display]`.
+Install the optional integration with `--shared-wake`, then restart both services.
+See the [step-by-step sleep/wake guide](docs/RPI_SLEEP.md).
+KlipperScreen updates can overwrite this optional integration.

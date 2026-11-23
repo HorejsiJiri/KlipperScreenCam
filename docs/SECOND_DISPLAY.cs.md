@@ -1,11 +1,14 @@
 # Druhý HDMI displej a dva dotyky — krok za krokem
 
-Tento postup rozvádí konfiguraci, kterou jsme použili při nasazení: Raspberry Pi 5,
-Debian/Raspberry Pi OS 13 (Trixie), KlipperScreen přes X11, dva HDMI dotykové displeje
-1024 × 600. Je určený i pro novou instalaci, kde zatím běží pouze KlipperScreen.
+[English](SECOND_DISPLAY.md) · [Česky](SECOND_DISPLAY.cs.md)
 
-**KlipperScreenCam sám HDMI ani dotyky nenastavuje.** Nejdříve připravíme společnou
-rozšířenou plochu; teprve potom spustíme kamerový displej. Nepoužívej tento návod
+Tento postup vychází z mé tiskárny: Raspberry Pi 5, Debian 13 (Trixie), KlipperScreen přes X11 a dva HDMI dotykové displeje 1024 × 600. Popisuji zde i nastavení rozšířené plochy a obou dotyků, abys je nemusel hledat v dalších návodech.
+
+Postup můžeš použít i pro novou instalaci, kde zatím běží pouze KlipperScreen.
+Příklady odpovídají mému zapojení; názvy zařízení a cesty přizpůsob svému systému.
+
+**KlipperScreenCam sám HDMI ani dotyky nenastavuje.** Nejdříve připrav společnou
+rozšířenou plochu; teprve potom spusť kamerový displej. Nepoužívej tento návod
 naslepo pro Wayland, DSI/GPIO displeje nebo jiné rozlišení.
 
 Příkazy zadávej přes SSH jako běžný uživatel tiskárny, tedy stejný uživatel jako
@@ -28,7 +31,7 @@ systemctl cat KlipperScreen
 ps -eo user,pid,args | grep -E 'Xorg|Xwayland|wayfire|labwc|screen.py' | grep -v grep
 ```
 
-V našem případě běžel Xorg na `:0` a služba používala `BACKEND=X`.
+Na mém RPi běžel Xorg na `:0` a služba používala `BACKEND=X`.
 Pokud je zde Wayland, jiný uživatel nebo jiná X relace, nejdříve přizpůsob následující
 příkazy skutečnému systému. Neměň kvůli tomuto návodu naslepo `config.txt` ani grafický ovladač.
 
@@ -45,7 +48,7 @@ Pokud chybí diagnostické příkazy:
 sudo apt install --no-install-recommends x11-xserver-utils xinput
 ```
 
-Na naší instalaci jsou výstupy `HDMI-1` a `HDMI-2`. Jinde se mohou jmenovat jinak.
+Na mé instalaci jsou výstupy `HDMI-1` a `HDMI-2`. Jinde se mohou jmenovat jinak.
 Názvy `HDMI-A-1` v `/sys/class/drm` nejsou automaticky stejné jako názvy pro xrandr.
 Hvězdička u režimu znamená aktuální režim. `+0+0` u obou výstupů znamená překrytí
 ploch: stejný obraz na obou displejích není důkazem dvou instancí KlipperScreenu.
@@ -55,8 +58,8 @@ cestu XAUTHORITY; nepoužívej jako zkratku `xhost +`.
 
 ## 3. Nastav dočasně rozšířenou plochu
 
-Náš první monitor již nabízel `1024x600`, druhý původně jen `1024x576` a další režimy.
-Úspěšně jsme mu přiřadili **již existující** režim z prvního monitoru:
+Můj první monitor již nabízel `1024x600`, druhý původně jen `1024x576` a další režimy.
+Přiřadil jsem mu **již existující** režim z prvního monitoru:
 
 ```bash
 DISPLAY=:0 XAUTHORITY="$HOME/.Xauthority" xrandr --addmode HDMI-2 1024x600
@@ -88,7 +91,7 @@ Pokud je to potřeba, fyzicky prohoď HDMI kabely a znovu proveď detekci; tím 
 změnit přiřazení názvů výstupů ke konkrétním panelům.
 
 Pokud druhý monitor po změně ztratí obraz a původně měl funkční režim `1024x576`,
-dočasný návrat v našem konkrétním případě byl:
+dočasný návrat na mém zařízení byl:
 
 ```bash
 DISPLAY=:0 XAUTHORITY="$HOME/.Xauthority" xrandr \
@@ -112,7 +115,7 @@ vypisovat události pouze pro právě sledovaný dotyk. Ukonči pomocí Ctrl+C.
 Totéž můžeš zopakovat pro druhé ID. Zapiš si vztah **název zařízení → HDMI výstup**.
 
 Po přepojení nebo restartu se číselná ID mohou změnit. Pro trvalé nastavení proto
-použij názvy. Na našem zařízení se ověřilo toto přiřazení:
+použij názvy. Na svém zařízení jsem ověřil toto přiřazení:
 
 ```bash
 DISPLAY=:0 XAUTHORITY="$HOME/.Xauthority" xinput map-to-output \
@@ -134,7 +137,7 @@ KlipperScreen. Druhý dotyk definitivně ověř v menu kamer, až bude náhled s
 Pokud už máš funkční `start-displays.sh`, nedělej druhé paralelní nastavení a nic
 z tohoto oddílu nepřepisuj. Zachovej jej a postupuj podle MIGRATION.cs.md.
 
-Pro novou instalaci vytvoř vlastní spouštěcí skript. Použijeme adresář, který
+Pro novou instalaci vytvoř vlastní spouštěcí skript. Používám adresář, který
 nepatří do aktualizovaných zdrojů KlipperScreenu:
 
 ```bash
@@ -171,7 +174,7 @@ chmod +x ~/.config/KlipperScreenCam/start-klipperscreen.sh
 bash -n ~/.config/KlipperScreenCam/start-klipperscreen.sh
 ```
 
-Skript se musí spouštět **uvnitř již vytvořené X relace**, ne před Xorgem. Na našem
+Skript se musí spouštět **uvnitř již vytvořené X relace**, ne před Xorgem. V mé instalaci
 KlipperScreenu to řeší `KS_XCLIENT`, který předává jeho startovací skript programu xinit:
 
 ```bash
@@ -224,7 +227,7 @@ sudo systemctl restart KlipperScreen
 ## 6. Nainstaluj a spusť kamerový displej
 
 Teď pokračuj podle DEPLOY.cs.md. V `~/printer_data/config/KlipperScreenCam.conf` odpovídá
-našemu rozložení tato část:
+mému rozložení tato část:
 
 ```ini
 [display]
@@ -237,7 +240,7 @@ height = 600
 ```
 
 Kamerové okno pak vyplní druhý monitor. Vlastní služba KlipperScreenCam se spouští
-po KlipperScreenu a čeká na dostupnost X11; HDMI nastavení v našem wrapperu se tedy
+po KlipperScreenu a čeká na dostupnost X11; HDMI nastavení ve spouštěcím skriptu se tedy
 provede před otevřením aplikace. Po restartu KlipperScreenu vždy ověř stav obou služeb.
 
 ## 7. Ověření po úplném zapnutí
@@ -252,6 +255,8 @@ DISPLAY=:0 XAUTHORITY="$HOME/.Xauthority" xrandr --query
 ```
 
 Nakonec ověř zhasnutí a probuzení podle skutečného nastavení KlipperScreenu.
-X11 DPMS může ovládat oba výstupy; softwarový spořič v jeho okně druhý monitor
-automaticky nepokrývá. Zhasnutí samo o sobě neukončuje odběr kamery — k tomu slouží
-Vypnout obraz v našem menu.
+Pro společné probuzení a automatické zastavení místního streamu při uspání
+používám volitelnou integraci `--shared-wake`. Instalaci, konfiguraci a restart obou
+služeb popisuji v [návodu k uspávání](RPI_SLEEP.cs.md). Na svém RPi jsem ověřil
+společné probuzení i provoz po restartu. Bez této integrace samotné probuzení DPMS
+nemusí zavřít černou plochu spořiče KlipperScreenu.
